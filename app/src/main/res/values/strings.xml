@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Transmissões Desportivas</string>
+    <string name="strBtnCanais">Lista de Canais</string>
+    <string name="strBtnClose">Fechar</string>
+    <string name="backLstChannel">Voltar Lista de Canais</string>
+    <string name="strVs">Vs</string>
+</resources>
