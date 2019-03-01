@@ -18,7 +18,7 @@ class Match {
     private String absfileImgHomeTeam;
     private String absfileImgAwayTeam;
 
-    public Match(int matchId, int channelId, String domain, String matchDay, int homeTeamId, int awayTeamId, String homeTeam, String awayTeam, int sportsId, String channel, String sports) {
+    Match(int matchId, int channelId, String domain, String matchDay, int homeTeamId, int awayTeamId, String homeTeam, String awayTeam, int sportsId, String channel, String sports) {
         this.matchDay=matchDay;
         this.matchId=matchId;
         this.channelId=channelId;

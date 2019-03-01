@@ -4,4 +4,11 @@
     <string name="strBtnClose">Fechar</string>
     <string name="backLstChannel">Voltar Lista de Canais</string>
     <string name="strVs">Vs</string>
+    <string name="title_activity_main2">Lista de Canais</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Transmissões Desportivas App</string>
+    <string name="nav_header_subtitle">zerozero@myfeup.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.myfeup.zerozero;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,14 +10,21 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
+import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
 import org.json.JSONArray;
@@ -25,7 +33,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,45 +43,69 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 
+public class Main2Activity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
-public class MainActivity extends AppCompatActivity {
-
-    private String TAG = MainActivity.class.getSimpleName();
+    private String TAG = Main2Activity.class.getSimpleName();
 
     private ProgressDialog mProgressDialog;
 
     private Context mContext;
     private Activity mActivity;
 
-    private Button btn, btnClose;
     private ListView channelList;
     private ArrayList<TvChannel> arrayListChannel;
+    private ArrayList<Sport> arrayListSports;
 
     private URL urlTVChannel = null;
+    private URL urlSports = null;
     private JSONObject jsonTVChannel = null;
+    private JSONObject jsonSports = null;
 
     private static final String DISK_CACHE_SUBDIR = "Images";
 
     private CustomAdapter customAdapter;
-
+    private SportsAdapter sportsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main2);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        btn = findViewById(R.id.btnCanais);
-        btnClose = findViewById(R.id.btnClose);
-        channelList = findViewById(R.id.lstCanais);
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Eventos a Decorrer", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        channelList = findViewById(R.id.lst2Canais);
+
         arrayListChannel = new ArrayList<>();
         customAdapter = new CustomAdapter(this,arrayListChannel);
+
+        arrayListSports = new ArrayList<>();
+        sportsAdapter = new SportsAdapter(this,arrayListSports);
+
         channelList.setAdapter(customAdapter);
 
         // Get the application context
         mContext = getApplicationContext();
-        mActivity = MainActivity.this;
+        mActivity = Main2Activity.this;
 
         // Initialize the progress dialog
         mProgressDialog = new ProgressDialog(mActivity);
@@ -84,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         // Progress dialog title
         mProgressDialog.setTitle("Updating Application");
         // Progress dialog message
-        mProgressDialog.setMessage("Please wait, we are downloading new actualization...");
+        mProgressDialog.setMessage("Please wait, we are downloading content...");
 
         try {
             urlTVChannel = new URL("http://www.zerozero.pt/api/v1/getTVChannel/AppKey/6RaJ9G7G/DomainID/pt");
@@ -93,38 +124,109 @@ public class MainActivity extends AppCompatActivity {
         }
 
         arrayListChannel.clear();
-        new getJson().execute(urlTVChannel);
-
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                arrayListChannel.clear();
-                new getJson().execute(urlTVChannel);
-            }
-        });
-
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                android.os.Process.killProcess(android.os.Process.myPid());
-            }
-        });
+        new Main2Activity.getJson().execute(urlTVChannel);
 
         channelList.setClickable(true);
         channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
                 Intent infoChannel = new Intent(mContext, info_channel.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("tvChannel", arrayListChannel.get(i));
-                //infoChannel.putExtras(bundle);
                 infoChannel.putExtra("tvChannel",arrayListChannel.get(i));
-                //infoChannel.putExtra("arrayListChannel", arrayListChannel);
-                //infoChannel.putExtra("tvChannel", arrayListChannel.get(i));
                 startActivity(infoChannel);
             }
         });
+    }
 
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main2, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_channels) {
+           this.setTitle("Lista de Canais");
+            arrayListChannel.clear();
+            new Main2Activity.getJson().execute(urlTVChannel);
+
+            channelList.setAdapter(customAdapter);
+
+            channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
+                    Intent infoChannel = new Intent(mContext, info_channel.class);
+                    infoChannel.putExtra("tvChannel",arrayListChannel.get(i));
+                    startActivity(infoChannel);
+                }
+            });
+
+
+        } else if (id == R.id.nav_sports) {
+            try {
+                this.setTitle("Lista de Desportos");
+                urlSports = new URL("http://www.zerozero.pt/api/v1/getSports/AppKey/7UdS89gI");
+                arrayListSports.clear();
+                new Main2Activity.getJsonSports().execute(urlSports);
+                channelList.setAdapter(sportsAdapter);
+
+                channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
+                        Intent infoSport = new Intent(mContext, info_sport.class);
+                        infoSport.putExtra("tvSports",arrayListSports.get(i));
+                        startActivity(infoSport);
+                    }
+                });
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+
+            new Main2Activity.getJson().execute(urlTVChannel);
+        } else if (id == R.id.nav_teams) {
+
+        } else if (id == R.id.nav_login) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_close) {
+            android.os.Process.killProcess(android.os.Process.myPid());
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     public JSONObject getJsonUrl(URL url) throws IOException {
@@ -142,16 +244,17 @@ public class MainActivity extends AppCompatActivity {
         } finally {
             urlConnection.disconnect();
         }
-        if (jsonStr != null) {
-            try {
-               jsonObj = new JSONObject(jsonStr);
-            } catch (final JSONException e) {
-                Log.e(TAG, "Json parsing error: " + e.getMessage());
-            }
+
+        try {
+            jsonObj = new JSONObject(jsonStr);
+        } catch (final JSONException e) {
+            Log.e(TAG, "Json parsing error: " + e.getMessage());
         }
+
         return jsonObj;
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class getJson extends AsyncTask<URL, Integer, Long> {
 
         JSONObject jsonObj = null;
@@ -201,57 +304,16 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if (c != null) {
-                    String channel_id = null;
-                    try {
-                        channel_id = c.getString("CHANNELID");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String channel = null;
-                    try {
-                        channel = c.getString("CHANNEL");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String domain = null;
-                    try {
-                        domain = c.getString("DOMAIN");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String img_path = null;
-                    String fileName = null;
-                    try {
-                        img_path = c.getString("IMGPATH");
-                        fileName = img_path.substring(img_path.lastIndexOf('/') + 1);
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String img_height = null;
-                    try {
-                        img_height = c.getString("IMGHEIGHT");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String img_width = null;
-                    try {
-                        img_width = c.getString("IMGWIDTH");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    String channel_id = getJsonString(c,"CHANNELID");
+                    String channel = getJsonString(c,"CHANNEL");
+                    String domain = getJsonString(c,"DOMAIN");
+                    String img_path = getJsonString(c,"IMGPATH");
+                    String img_height = getJsonString(c,"IMGHEIGHT");
+                    String img_width = getJsonString(c,"IMGWIDTH");
 
-                    // tmp hash map for single contact
-                    HashMap<String, String> channels = new HashMap<>();
-
-                    // adding each child node to HashMap key => value
-                    channels.put("channel_id", channel_id);
-                    channels.put("channel", channel);
-                    channels.put("domain", domain);
-                    channels.put("img_path", img_path);
-                    channels.put("img_height", img_height);
-                    channels.put("img_width", img_width);
+                    String fileName = img_path.substring(img_path.lastIndexOf('/') + 1);
 
                     Log.d(TAG, channel_id + " - " + channel + " - " + img_path + " - " + fileName);
                     TvChannel nChannel = new TvChannel(Integer.parseInt(channel_id),
@@ -265,19 +327,90 @@ public class MainActivity extends AppCompatActivity {
                     if (!file.exists()) {
                         // TODO: Get Image and Cache Image TvChannel
                         // Execute the async task
-                        new DownloadTask(nChannel).execute(img_path, fileName);
+                        new Main2Activity.DownloadTask(nChannel).execute(img_path, fileName);
                     } else {
                         nChannel.setAbsImgFileName(file.getAbsolutePath());
                     }
                     arrayListChannel.add(nChannel);
-                }
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
             customAdapter.notifyDataSetChanged();
-            //Log.d(TAG,"Downloaded " + result + " bytes");
         }
-
     }
+
+    @SuppressLint("StaticFieldLeak")
+    private class getJsonSports extends AsyncTask<URL, Integer, Long> {
+
+        JSONObject jsonObj = null;
+
+        protected Long doInBackground(URL... urls) {
+            int count = urls.length;
+            long totalSize = 0;
+            for (int i = 0; i < count; i++) {
+                try {
+                    jsonObj = getJsonUrl(urls[i]);
+                    switch (i){
+                        case 0:
+                            jsonSports = jsonObj;
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                publishProgress((int) ((i / (float) count) * 100));
+                // Escape early if cancel() is called
+                if (isCancelled()) break;
+            }
+            return totalSize;
+        }
+        protected void onPostExecute(Long result) {
+
+            JSONObject mydata = null;
+            try {
+                mydata = jsonSports.getJSONObject("data");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            JSONArray sports = null;
+            try {
+                sports = mydata.getJSONArray("SPORTS");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            // looping through All Channels
+            for (int i = 0; i < sports.length(); i++) {
+                JSONObject sport = null;
+                try {
+                    sport = sports.getJSONObject(i);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    String sport_id = getJsonString(sport,"ID");
+                    String name = getJsonString(sport,"NAME");
+                    String shortname = getJsonString(sport,"SHORTNAME");
+
+                    Log.d(TAG, sport_id + " - " + name + " - " + shortname);
+                    Sport nSport = new Sport(Integer.parseInt(sport_id),
+                            name, shortname);
+
+                    arrayListSports.add(nSport);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            sportsAdapter.notifyDataSetChanged();
+        }
+    }
+
     private String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
@@ -302,26 +435,21 @@ public class MainActivity extends AppCompatActivity {
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     /* Checks if external storage is available to at least read */
     public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
 
 
     /**
      * Store Images on local filesystem
      */
+    @SuppressLint("StaticFieldLeak")
     private class DownloadTask extends AsyncTask<String, Void, Bitmap>{
 
         TvChannel tvChannel;
@@ -405,7 +533,7 @@ public class MainActivity extends AppCompatActivity {
 
         try{
             // Initialize a new OutputStream
-            OutputStream stream = null;
+            OutputStream stream;
 
             // If the output file exists, it can be replaced or appended to it
             stream = new FileOutputStream(file);
@@ -431,5 +559,10 @@ public class MainActivity extends AppCompatActivity {
         return savedImageURI;
     }
 
+    private String getJsonString(JSONObject c, String key) throws JSONException {
+        String val = null;
+        if (c!=null)
+            val = c.getString(key);
+        return val;
+    }
 }
-

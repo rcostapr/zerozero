@@ -9,15 +9,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +23,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,45 +33,40 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 
+public class info_sport extends AppCompatActivity {
 
-public class MainActivity extends AppCompatActivity {
-
-    private String TAG = MainActivity.class.getSimpleName();
+    private String TAG = info_sport.class.getSimpleName();
+    private static final String DISK_CACHE_SUBDIR = "Teams";
 
     private ProgressDialog mProgressDialog;
-
     private Context mContext;
     private Activity mActivity;
 
-    private Button btn, btnClose;
-    private ListView channelList;
-    private ArrayList<TvChannel> arrayListChannel;
-
-    private URL urlTVChannel = null;
     private JSONObject jsonTVChannel = null;
 
-    private static final String DISK_CACHE_SUBDIR = "Images";
+    private ArrayList<Match> arrayListChannel;
+    private Sport tvSport;
+    private URL urlChannel;
+    private ListView channelList;
+    private MatchAdapter matchAdapter;
 
-    private CustomAdapter customAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_info_channel);
+        setTitle(R.string.backLstChannel);
 
-        btn = findViewById(R.id.btnCanais);
-        btnClose = findViewById(R.id.btnClose);
-        channelList = findViewById(R.id.lstCanais);
+        channelList = findViewById(R.id.lstMatch);
         arrayListChannel = new ArrayList<>();
-        customAdapter = new CustomAdapter(this,arrayListChannel);
-        channelList.setAdapter(customAdapter);
+        matchAdapter = new MatchAdapter(this,arrayListChannel);
+        channelList.setAdapter(matchAdapter);
 
         // Get the application context
         mContext = getApplicationContext();
-        mActivity = MainActivity.this;
+        mActivity = info_sport.this;
 
         // Initialize the progress dialog
         mProgressDialog = new ProgressDialog(mActivity);
@@ -86,45 +78,31 @@ public class MainActivity extends AppCompatActivity {
         // Progress dialog message
         mProgressDialog.setMessage("Please wait, we are downloading new actualization...");
 
+        Intent intent = getIntent();
+        this.tvSport =  (Sport) intent.getSerializableExtra("tvSports");
+
+        TextView txtView1 = findViewById(R.id.chntxt1);
+        TextView txtView2 = findViewById(R.id.chntxt2);
+        txtView1.setText(Integer.toString(tvSport.getId()));
+        txtView2.setText(tvSport.getName());
+        ImageView iv = findViewById(R.id.imgChannelId);
+        iv.setImageResource(R.drawable.ic_video_camera);
+
+        this.urlChannel = getUrl("http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/pt/SportsID/"
+                + Integer.toString(tvSport.getId()));
+
+        new getJson().execute(this.urlChannel);
+    }
+
+    private URL getUrl(String strUrl){
+        URL url = null;
+
         try {
-            urlTVChannel = new URL("http://www.zerozero.pt/api/v1/getTVChannel/AppKey/6RaJ9G7G/DomainID/pt");
+            url = new URL(strUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
-        arrayListChannel.clear();
-        new getJson().execute(urlTVChannel);
-
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                arrayListChannel.clear();
-                new getJson().execute(urlTVChannel);
-            }
-        });
-
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                android.os.Process.killProcess(android.os.Process.myPid());
-            }
-        });
-
-        channelList.setClickable(true);
-        channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
-                Intent infoChannel = new Intent(mContext, info_channel.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("tvChannel", arrayListChannel.get(i));
-                //infoChannel.putExtras(bundle);
-                infoChannel.putExtra("tvChannel",arrayListChannel.get(i));
-                //infoChannel.putExtra("arrayListChannel", arrayListChannel);
-                //infoChannel.putExtra("tvChannel", arrayListChannel.get(i));
-                startActivity(infoChannel);
-            }
-        });
-
+        return url;
     }
 
     public JSONObject getJsonUrl(URL url) throws IOException {
@@ -142,13 +120,13 @@ public class MainActivity extends AppCompatActivity {
         } finally {
             urlConnection.disconnect();
         }
-        if (jsonStr != null) {
-            try {
-               jsonObj = new JSONObject(jsonStr);
-            } catch (final JSONException e) {
-                Log.e(TAG, "Json parsing error: " + e.getMessage());
-            }
+
+        try {
+            jsonObj = new JSONObject(jsonStr);
+        } catch (final JSONException e) {
+            Log.e(TAG, "Json parsing error: " + e.getMessage());
         }
+
         return jsonObj;
     }
 
@@ -188,12 +166,12 @@ public class MainActivity extends AppCompatActivity {
             }
             JSONArray tvchannels = null;
             try {
-                tvchannels = mydata.getJSONArray("TVCHANNEL");
+                tvchannels = mydata.getJSONArray("ZAPPING");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            // looping through All Channels
+            // looping through All matches
             for (int i = 0; i < tvchannels.length(); i++) {
                 JSONObject c = null;
                 try {
@@ -201,83 +179,79 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if (c != null) {
-                    String channel_id = null;
-                    try {
-                        channel_id = c.getString("CHANNELID");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String channel = null;
-                    try {
-                        channel = c.getString("CHANNEL");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String domain = null;
-                    try {
-                        domain = c.getString("DOMAIN");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String img_path = null;
-                    String fileName = null;
-                    try {
-                        img_path = c.getString("IMGPATH");
-                        fileName = img_path.substring(img_path.lastIndexOf('/') + 1);
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String img_height = null;
-                    try {
-                        img_height = c.getString("IMGHEIGHT");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String img_width = null;
-                    try {
-                        img_width = c.getString("IMGWIDTH");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    // tmp hash map for single contact
-                    HashMap<String, String> channels = new HashMap<>();
-
-                    // adding each child node to HashMap key => value
-                    channels.put("channel_id", channel_id);
-                    channels.put("channel", channel);
-                    channels.put("domain", domain);
-                    channels.put("img_path", img_path);
-                    channels.put("img_height", img_height);
-                    channels.put("img_width", img_width);
-
-                    Log.d(TAG, channel_id + " - " + channel + " - " + img_path + " - " + fileName);
-                    TvChannel nChannel = new TvChannel(Integer.parseInt(channel_id),
-                            channel, img_path, Integer.parseInt(img_width),
-                            Integer.parseInt(img_height), domain);
+                try {
+                    String matchId = getJsonString(c,"MATCHID");
+                    String channelId = getJsonString(c,"CHANNELID");
+                    String domain = getJsonString(c,"DOMAIN");
+                    String matchDay = getJsonString(c,"DATA");
+                    String homeTeamId = getJsonString(c,"HOMETEAMID");
+                    String awayTeamId = getJsonString(c,"AWAYTEAMID");
+                    String homeTeam = getJsonString(c,"HOMETEAM");
+                    String awayTeam = getJsonString(c,"AWAYTEAM");
+                    String sportsId = getJsonString(c,"SPORTSID");
+                    String channel = getJsonString(c,"CHANNEL");
+                    String sports = getJsonString(c,"SPORTS");
+                    String imgHomeTeam = getJsonString(c,"HOMETEAM_LOGO");
+                    String fileImgHomeTeam = imgHomeTeam.substring(imgHomeTeam.lastIndexOf('/') + 1);
+                    String imgAwatTeam = getJsonString(c,"AWAYTEAM_LOGO");
+                    String fileImgAwatTeam = imgAwatTeam.substring(imgAwatTeam.lastIndexOf('/') + 1);
 
                     ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
-                    File file = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);
-                    file = new File(file, fileName);
+                    File file1 = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);
+                    file1 = new File(file1, fileImgHomeTeam);
+                    File file2 = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);
+                    file2 = new File(file2, fileImgAwatTeam);
 
-                    if (!file.exists()) {
-                        // TODO: Get Image and Cache Image TvChannel
-                        // Execute the async task
-                        new DownloadTask(nChannel).execute(img_path, fileName);
+
+
+                    Log.d(TAG, channelId + " - " + homeTeam + " - " + awayTeam + " - " + matchDay);
+                    Match nMatch = new Match(Integer.parseInt(matchId),
+                            Integer.parseInt(channelId),
+                            domain,
+                            matchDay,
+                            Integer.parseInt(homeTeamId),
+                            Integer.parseInt(awayTeamId),
+                            homeTeam,
+                            awayTeam,
+                            Integer.parseInt(sportsId),
+                            channel,
+                            sports);
+
+
+                    if (!file1.exists()) {
+                        new DownloadTask(nMatch,1).execute(imgHomeTeam, fileImgHomeTeam);
                     } else {
-                        nChannel.setAbsImgFileName(file.getAbsolutePath());
+                        nMatch.setAbsfileImgHomeTeam(file1.getAbsolutePath());
                     }
-                    arrayListChannel.add(nChannel);
+                    if (!file2.exists()) {
+                        new DownloadTask(nMatch,2).execute(imgAwatTeam, fileImgAwatTeam);
+                    } else {
+                        nMatch.setAbsfileImgAwayTeam(file2.getAbsolutePath());
+                    }
+
+
+                    arrayListChannel.add(nMatch);
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
             }
-            customAdapter.notifyDataSetChanged();
-            //Log.d(TAG,"Downloaded " + result + " bytes");
+            matchAdapter.notifyDataSetChanged();
+
         }
 
     }
+
+    private String getJsonString(JSONObject c, String key) throws JSONException {
+        String val = null;
+        if (c!=null)
+            val = c.getString(key);
+        return val;
+    }
+
     private String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
@@ -324,10 +298,12 @@ public class MainActivity extends AppCompatActivity {
      */
     private class DownloadTask extends AsyncTask<String, Void, Bitmap>{
 
-        TvChannel tvChannel;
+        Match tvMatch;
+        int team;
 
-        private DownloadTask(TvChannel tvChannel) {
-            this.tvChannel = tvChannel;
+        private DownloadTask(Match tvMatch, int team) {
+            this.tvMatch = tvMatch;
+            this.team = team;
         }
         // Before the tasks execution
         protected void onPreExecute(){
@@ -358,7 +334,11 @@ public class MainActivity extends AppCompatActivity {
                 Uri imageInternalUri = saveImageToInternalStorage(bmp, urls[1]);
 
                 //Log.d(TAG,imageInternalUri.toString());
-                tvChannel.setAbsImgFileName(imageInternalUri.toString());
+                if(team==1){
+                    tvMatch.setAbsfileImgHomeTeam(imageInternalUri.toString());
+                } else {
+                    tvMatch.setAbsfileImgAwayTeam(imageInternalUri.toString());
+                }
 
                 // Return the downloaded bitmap
                 return bmp;
@@ -376,19 +356,8 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Bitmap result){
             // Hide the progress dialog
             mProgressDialog.dismiss();
-            customAdapter.notifyDataSetChanged();
+            matchAdapter.notifyDataSetChanged();
         }
-    }
-
-    // Custom method to convert string to url
-    protected URL stringToURL(String urlString){
-        try{
-            URL url = new URL(urlString);
-            return url;
-        }catch(MalformedURLException e){
-            e.printStackTrace();
-        }
-        return null;
     }
 
     // Custom method to save a bitmap into internal storage
@@ -431,5 +400,14 @@ public class MainActivity extends AppCompatActivity {
         return savedImageURI;
     }
 
+    // Custom method to convert string to url
+    protected URL stringToURL(String urlString){
+        try{
+            URL url = new URL(urlString);
+            return url;
+        }catch(MalformedURLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
-
