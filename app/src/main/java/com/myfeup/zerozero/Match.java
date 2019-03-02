@@ -1,6 +1,8 @@
 package com.myfeup.zerozero;
 
-class Match {
+import java.io.Serializable;
+
+class Match implements Serializable {
 
     private int matchId;
     private int channelId;

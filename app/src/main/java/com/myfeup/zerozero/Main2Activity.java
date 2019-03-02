@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -70,11 +72,13 @@ public class Main2Activity extends AppCompatActivity
 
     private static final String DISK_CACHE_SUBDIR = "Images";
     private static final String FILE_STATE = "out.txt";
+    private static final String COLOR_BACKGROUND = "#FF4081";
 
     private CustomAdapter customAdapter;
     private SportsAdapter sportsAdapter;
 
     private SwipeRefreshLayout swipeRefreshLayout;
+    private FloatingActionButton fab;
 
     private State state = new State(1);
 
@@ -85,6 +89,12 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Get the application context
+        mContext = getApplicationContext();
+        mActivity = Main2Activity.this;
+        channelList = findViewById(R.id.lst2Canais);
+
+        // GET File Status
         File file = getApplicationContext().getFileStreamPath(FILE_STATE);
         if(file.exists()) {
             try {
@@ -97,7 +107,8 @@ public class Main2Activity extends AppCompatActivity
             }
         }
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        // Setting Favoritos Icon
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -115,19 +126,13 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        channelList = findViewById(R.id.lst2Canais);
-
+        // Register customAdapter
         arrayListChannel = new ArrayList<>();
         customAdapter = new CustomAdapter(this,arrayListChannel);
 
+        // Register sportsAdapter
         arrayListSports = new ArrayList<>();
         sportsAdapter = new SportsAdapter(this,arrayListSports);
-
-        channelList.setAdapter(customAdapter);
-
-        // Get the application context
-        mContext = getApplicationContext();
-        mActivity = Main2Activity.this;
 
         // Initialize the progress dialog
         mProgressDialog = new ProgressDialog(mActivity);
@@ -145,12 +150,19 @@ public class Main2Activity extends AppCompatActivity
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+        boolean isConnected = checkInternetConnection();
 
         switch (state.getState()){
             case 1:
-                arrayListChannel.clear();
-                new Main2Activity.getJson().execute(urlTVChannel);
-
+                if(isConnected) {
+                    arrayListChannel.clear();
+                    new Main2Activity.getJson().execute(urlTVChannel);
+                } else {
+                    if(state.getArrayListChannel()!=null)
+                        this.arrayListChannel = state.getArrayListChannel();
+                    customAdapter = new CustomAdapter(this,arrayListChannel);
+                }
+                channelList.setAdapter(customAdapter);
                 channelList.setClickable(true);
                 channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -163,10 +175,15 @@ public class Main2Activity extends AppCompatActivity
                 break;
             case 2:
                 this.setTitle("Lista de Desportos");
-                arrayListSports.clear();
-                new Main2Activity.getJsonSports().execute(urlSports);
+                if(isConnected) {
+                    arrayListSports.clear();
+                    new Main2Activity.getJsonSports().execute(urlSports);
+                } else {
+                    this.arrayListSports = state.getArrayListSports();
+                    sportsAdapter = new SportsAdapter(this,arrayListSports);
+                }
                 channelList.setAdapter(sportsAdapter);
-
+                channelList.setClickable(true);
                 channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
@@ -181,29 +198,65 @@ public class Main2Activity extends AppCompatActivity
         }
 
         swipeRefreshLayout=findViewById(R.id.swiperefresh);
-        swipeRefreshLayout.setColorSchemeColors(Color.parseColor("#FF4081"));
+        swipeRefreshLayout.setColorSchemeColors(Color.parseColor(COLOR_BACKGROUND));
 
-        Log.d(TAG,"State -> " + Integer.toString(state.getState()));
-
+        // Register swipeRefreshLayout
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
 
+                boolean isConnected = checkInternetConnection();
                 Log.d(TAG,"State -> " + Integer.toString(state.getState()));
-                switch (state.getState()){
-                    case 1:
-                        arrayListChannel.clear();
-                        new Main2Activity.getJson().execute(urlTVChannel);
-                        break;
-                    case 2:
-                        arrayListSports.clear();
-                        new Main2Activity.getJsonSports().execute(urlSports);
-                        break;
-                    default:
-                        break;
+                if (isConnected) {
+                    switch (state.getState()) {
+                        case 1:
+                            arrayListChannel.clear();
+                            new Main2Activity.getJson().execute(urlTVChannel);
+                            break;
+                        case 2:
+                            arrayListSports.clear();
+                            new Main2Activity.getJsonSports().execute(urlSports);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         });
+    }
+
+    private boolean checkInternetConnection() {
+
+        View view = findViewById(R.id.lst2Canais);
+
+        ConnectivityManager cm =
+                (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        Log.d("CONNECTIVITY" , "INTERNET -> " + isConnected);
+        if(!isConnected){
+            if(swipeRefreshLayout != null)
+                swipeRefreshLayout.setRefreshing(false);
+            // Setting Snackbar
+            Snackbar snackbar = Snackbar.make(view, "Sem ligação à internet", Snackbar.LENGTH_LONG).setAction("Action", null);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorAlert));
+            snackbar.show();
+        } else {
+            boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+            state.setWiFi(isWiFi);
+
+            if(!state.isInternetStatus()) {
+                // Setting Snackbar
+                //Snackbar snackbar = Snackbar.make(view, "Com ligação à internet", Snackbar.LENGTH_LONG).setAction("Action", null);
+                //snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorOks));
+                //snackbar.show();
+            }
+        }
+        state.setInternetStatus(isConnected);
+        return isConnected;
     }
 
     @Override
@@ -252,47 +305,54 @@ public class Main2Activity extends AppCompatActivity
                 e.printStackTrace();
             }
             this.setTitle("Lista de Canais");
-            arrayListChannel.clear();
-            new Main2Activity.getJson().execute(urlTVChannel);
 
+            boolean isConnected = checkInternetConnection();
+
+            if(isConnected) {
+                arrayListChannel.clear();
+                new Main2Activity.getJson().execute(urlTVChannel);
+            } else {
+                this.arrayListChannel = state.getArrayListChannel();
+                customAdapter = new CustomAdapter(this,arrayListChannel);
+            }
             channelList.setAdapter(customAdapter);
-
             channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
                     Intent infoChannel = new Intent(mContext, info_channel.class);
-                    infoChannel.putExtra("tvChannel",arrayListChannel.get(i));
+                    infoChannel.putExtra("tvChannel", arrayListChannel.get(i));
                     startActivity(infoChannel);
                 }
             });
-
-
         } else if (id == R.id.nav_sports) {
             try {
                 this.state.setState(2);
                 saveState(state);
                 this.setTitle("Lista de Desportos");
-                urlSports = new URL("http://www.zerozero.pt/api/v1/getSports/AppKey/7UdS89gI");
-                arrayListSports.clear();
-                new Main2Activity.getJsonSports().execute(urlSports);
+                boolean isConnected = checkInternetConnection();
+
+                if(isConnected) {
+                    arrayListSports.clear();
+                    new Main2Activity.getJsonSports().execute(urlSports);
+                } else {
+                    this.arrayListSports = state.getArrayListSports();
+                    sportsAdapter = new SportsAdapter(this,arrayListSports);
+                }
                 channelList.setAdapter(sportsAdapter);
 
                 channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
                         Intent infoSport = new Intent(mContext, info_sport.class);
-                        infoSport.putExtra("tvSports",arrayListSports.get(i));
+                        infoSport.putExtra("tvSports", arrayListSports.get(i));
                         startActivity(infoSport);
                     }
                 });
-
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            new Main2Activity.getJson().execute(urlTVChannel);
         } else if (id == R.id.nav_teams) {
 
         } else if (id == R.id.nav_login) {
@@ -403,7 +463,6 @@ public class Main2Activity extends AppCompatActivity
                     file = new File(file, fileName);
 
                     if (!file.exists()) {
-                        // TODO: Get Image and Cache Image TvChannel
                         // Execute the async task
                         new Main2Activity.DownloadTask(nChannel).execute(img_path, fileName);
                     } else {
@@ -414,6 +473,12 @@ public class Main2Activity extends AppCompatActivity
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+            state.setArrayListChannel(arrayListChannel);
+            try {
+                saveState(state);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             customAdapter.notifyDataSetChanged();
             swipeRefreshLayout.setRefreshing(false);
@@ -485,6 +550,12 @@ public class Main2Activity extends AppCompatActivity
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+            state.setArrayListSports(arrayListSports);
+            try {
+                saveState(state);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             sportsAdapter.notifyDataSetChanged();
             swipeRefreshLayout.setRefreshing(false);

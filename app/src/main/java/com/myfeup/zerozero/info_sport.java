@@ -7,15 +7,21 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,10 +30,13 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -50,6 +59,11 @@ public class info_sport extends AppCompatActivity {
     private URL urlChannel;
     private ListView channelList;
     private MatchAdapter matchAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    private static final String COLOR_BACKGROUND = "#FF4081";
+    private static final String FILE_STATE = "out.txt";
+    private State state = new State(1);
 
 
 
@@ -57,7 +71,31 @@ public class info_sport extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_channel);
-        setTitle("Voltar Lista de Desportos");
+
+        boolean isConnected = checkInternetConnection();
+        File file = getApplicationContext().getFileStreamPath(FILE_STATE);
+        if(file.exists()) {
+            try {
+                Log.d(TAG,"File Exists State -> " + Integer.toString(state.getState()));
+                this.state = getState();
+                Log.d("ArrayTvSportList","Before SIZE -> " + this.state.getArrayTvChannelList().size());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        switch (state.getState()){
+            case 1:
+
+                break;
+            case 2:
+                this.setTitle("Voltar Lista de Desportos");
+                break;
+            default:
+                break;
+        }
 
         channelList = findViewById(R.id.lstMatch);
         arrayListChannel = new ArrayList<>();
@@ -91,7 +129,32 @@ public class info_sport extends AppCompatActivity {
         this.urlChannel = getUrl("http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/pt/SportsID/"
                 + Integer.toString(tvSport.getId()));
 
-        new getJson().execute(this.urlChannel);
+        swipeRefreshLayout=findViewById(R.id.swiperefreshsport);
+        swipeRefreshLayout.setColorSchemeColors(Color.parseColor(COLOR_BACKGROUND));
+
+        // Register swipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                boolean isConnected = checkInternetConnection();
+
+                if (isConnected) {
+                    arrayListChannel.clear();
+                    new getJson().execute(urlChannel);
+                } else {
+                    // TODO
+                    importTvListFromCache();
+                }
+            }
+        });
+
+        if (isConnected) {
+            new getJson().execute(this.urlChannel);
+        } else {
+            // TODO Try to get from cache
+            importTvListFromCache();
+        }
     }
 
     private URL getUrl(String strUrl){
@@ -239,7 +302,15 @@ public class info_sport extends AppCompatActivity {
                 }
 
             }
+            TvSportList nTvSportList = new TvSportList(tvSport.getId(),arrayListChannel);
+            state.addArrayTvSportList(nTvSportList);
+            try {
+                saveState(state);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             matchAdapter.notifyDataSetChanged();
+            swipeRefreshLayout.setRefreshing(false);
 
         }
 
@@ -409,5 +480,65 @@ public class info_sport extends AppCompatActivity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void saveState(State state) throws IOException {
+        FileOutputStream fos = getApplicationContext().openFileOutput(FILE_STATE, Context.MODE_PRIVATE);
+        ObjectOutputStream os = new ObjectOutputStream(fos);
+        os.writeObject(state);
+        os.close();
+        fos.close();
+    }
+
+    private State getState() throws IOException, ClassNotFoundException {
+        FileInputStream fis = getApplicationContext().openFileInput(FILE_STATE);
+        ObjectInputStream is = new ObjectInputStream(fis);
+        State myState = (State) is.readObject();
+        is.close();
+        fis.close();
+        return myState;
+    }
+
+    private boolean checkInternetConnection() {
+
+        View view = findViewById(R.id.lst2Canais);
+
+        ConnectivityManager cm =
+                (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        Log.d("CONNECTIVITY" , "INTERNET -> " + isConnected);
+        if(!isConnected){
+            if(!state.isInternetStatus()) {
+                // Setting Toast
+                Context context = getApplicationContext();
+                CharSequence text = "Sem ligação à internet";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+            }
+        } else {
+            boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+            state.setWiFi(isWiFi);
+        }
+        state.setInternetStatus(isConnected);
+        return isConnected;
+    }
+
+    private void importTvListFromCache(){
+        ArrayList<TvSportList> arrayTvSportList = state.getArrayTvSportList();
+        for(int k=0;k<arrayTvSportList.size();k++){
+            if(arrayTvSportList.get(k).getId()==tvSport.getId()){
+                this.arrayListChannel = arrayTvSportList.get(k).getArrayListChannel();
+                matchAdapter = new MatchAdapter(this,arrayListChannel);
+                channelList.setAdapter(matchAdapter);
+                break;
+            }
+        }
+        swipeRefreshLayout.setRefreshing(false);
     }
 }

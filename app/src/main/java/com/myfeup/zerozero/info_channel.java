@@ -7,17 +7,21 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,7 +59,9 @@ public class info_channel extends AppCompatActivity {
     private URL urlChannel;
     private ListView channelList;
     private MatchAdapter matchAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
+    private static final String COLOR_BACKGROUND = "#FF4081";
     private static final String FILE_STATE = "out.txt";
     private State state = new State(1);
 
@@ -64,11 +70,13 @@ public class info_channel extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_channel);
 
+        boolean isConnected = checkInternetConnection();
         File file = getApplicationContext().getFileStreamPath(FILE_STATE);
         if(file.exists()) {
             try {
                 Log.d(TAG,"File Exists State -> " + Integer.toString(state.getState()));
                 this.state = getState();
+                Log.d("ArrayTvChannelList","Before SIZE -> " + this.state.getArrayTvChannelList().size());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -81,7 +89,6 @@ public class info_channel extends AppCompatActivity {
                 this.setTitle("Voltar Lista de Canais");
                 break;
             case 2:
-                this.setTitle("Voltar Lista de Desportos");
                 break;
             default:
                 break;
@@ -108,6 +115,7 @@ public class info_channel extends AppCompatActivity {
 
         Intent intent = getIntent();
         this.tvChannel =  (TvChannel) intent.getSerializableExtra("tvChannel");
+        this.urlChannel = getUrl("http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/pt/ChannelID/" + Integer.toString(tvChannel.getId()));
 
         TextView txtView1 = findViewById(R.id.chntxt1);
         TextView txtView2 = findViewById(R.id.chntxt2);
@@ -116,9 +124,32 @@ public class info_channel extends AppCompatActivity {
         ImageView iv = findViewById(R.id.imgChannelId);
         iv.setImageURI(Uri.parse(tvChannel.getAbsImgFileName()));
 
-        this.urlChannel = getUrl("http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/pt/ChannelID/" + Integer.toString(tvChannel.getId()));
+        swipeRefreshLayout=findViewById(R.id.swiperefreshsport);
+        swipeRefreshLayout.setColorSchemeColors(Color.parseColor(COLOR_BACKGROUND));
 
-        new getJson().execute(this.urlChannel);
+        // Register swipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                boolean isConnected = checkInternetConnection();
+
+                if (isConnected) {
+                    arrayListChannel.clear();
+                    new getJson().execute(urlChannel);
+                } else {
+                    // TODO
+                    importTvListFromCache();
+                }
+            }
+        });
+
+        if (isConnected) {
+            new getJson().execute(this.urlChannel);
+        } else {
+            // TODO Try to get from cache
+            importTvListFromCache();
+        }
     }
 
     private URL getUrl(String strUrl){
@@ -266,8 +297,15 @@ public class info_channel extends AppCompatActivity {
                 }
 
             }
+            TvChannelList nTvChannelList = new TvChannelList(tvChannel.getId(),arrayListChannel);
+            state.addArrayTvChannelList(nTvChannelList);
+            try {
+                saveState(state);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             matchAdapter.notifyDataSetChanged();
-
+            swipeRefreshLayout.setRefreshing(false);
         }
 
     }
@@ -453,5 +491,48 @@ public class info_channel extends AppCompatActivity {
         is.close();
         fis.close();
         return myState;
+    }
+
+    private boolean checkInternetConnection() {
+
+        View view = findViewById(R.id.lst2Canais);
+
+        ConnectivityManager cm =
+                (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        Log.d("CONNECTIVITY" , "INTERNET -> " + isConnected);
+        if(!isConnected){
+            if(!state.isInternetStatus()) {
+                // Setting Toast
+                Context context = getApplicationContext();
+                CharSequence text = "Sem ligação à internet";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+            }
+        } else {
+            boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+            state.setWiFi(isWiFi);
+        }
+        state.setInternetStatus(isConnected);
+        return isConnected;
+    }
+
+    private void importTvListFromCache(){
+        ArrayList<TvChannelList> arrayTvChannelList = state.getArrayTvChannelList();
+        for(int k=0;k<arrayTvChannelList.size();k++){
+            if(arrayTvChannelList.get(k).getId()==tvChannel.getId()){
+                this.arrayListChannel = arrayTvChannelList.get(k).getArrayListChannel();
+                matchAdapter = new MatchAdapter(this,arrayListChannel);
+                channelList.setAdapter(matchAdapter);
+                break;
+            }
+        }
+        swipeRefreshLayout.setRefreshing(false);
     }
 }

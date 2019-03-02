@@ -6,4 +6,6 @@
     <color name="colorMenu">#FF4081</color>
     <color name="colorLightOrange">#DFBA4D</color>
     <color name="colorBlack">#000000</color>
+    <color name="colorAlert">#FF0303</color>
+    <color name="colorOks">#109E00</color>
 </resources>
