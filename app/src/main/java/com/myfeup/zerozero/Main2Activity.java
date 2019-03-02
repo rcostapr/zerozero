@@ -8,12 +8,14 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -34,10 +36,13 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -64,9 +69,14 @@ public class Main2Activity extends AppCompatActivity
     private JSONObject jsonSports = null;
 
     private static final String DISK_CACHE_SUBDIR = "Images";
+    private static final String FILE_STATE = "out.txt";
 
     private CustomAdapter customAdapter;
     private SportsAdapter sportsAdapter;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    private State state = new State(1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +85,23 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        File file = getApplicationContext().getFileStreamPath(FILE_STATE);
+        if(file.exists()) {
+            try {
+                Log.d(TAG,"File Exists State -> " + Integer.toString(state.getState()));
+                this.state = getState();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Eventos a Decorrer", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Ver Notificação de Eventos Favoritos", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -119,27 +141,74 @@ public class Main2Activity extends AppCompatActivity
 
         try {
             urlTVChannel = new URL("http://www.zerozero.pt/api/v1/getTVChannel/AppKey/6RaJ9G7G/DomainID/pt");
+            urlSports = new URL("http://www.zerozero.pt/api/v1/getSports/AppKey/7UdS89gI");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
-        arrayListChannel.clear();
-        new Main2Activity.getJson().execute(urlTVChannel);
+        switch (state.getState()){
+            case 1:
+                arrayListChannel.clear();
+                new Main2Activity.getJson().execute(urlTVChannel);
 
-        channelList.setClickable(true);
-        channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                channelList.setClickable(true);
+                channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
+                        Intent infoChannel = new Intent(mContext, info_channel.class);
+                        infoChannel.putExtra("tvChannel",arrayListChannel.get(i));
+                        startActivity(infoChannel);
+                    }
+                });
+                break;
+            case 2:
+                this.setTitle("Lista de Desportos");
+                arrayListSports.clear();
+                new Main2Activity.getJsonSports().execute(urlSports);
+                channelList.setAdapter(sportsAdapter);
+
+                channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
+                        Intent infoSport = new Intent(mContext, info_sport.class);
+                        infoSport.putExtra("tvSports",arrayListSports.get(i));
+                        startActivity(infoSport);
+                    }
+                });
+                break;
+            default:
+                break;
+        }
+
+        swipeRefreshLayout=findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setColorSchemeColors(Color.parseColor("#FF4081"));
+
+        Log.d(TAG,"State -> " + Integer.toString(state.getState()));
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
-                Intent infoChannel = new Intent(mContext, info_channel.class);
-                infoChannel.putExtra("tvChannel",arrayListChannel.get(i));
-                startActivity(infoChannel);
+            public void onRefresh() {
+
+                Log.d(TAG,"State -> " + Integer.toString(state.getState()));
+                switch (state.getState()){
+                    case 1:
+                        arrayListChannel.clear();
+                        new Main2Activity.getJson().execute(urlTVChannel);
+                        break;
+                    case 2:
+                        arrayListSports.clear();
+                        new Main2Activity.getJsonSports().execute(urlSports);
+                        break;
+                    default:
+                        break;
+                }
             }
         });
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -176,7 +245,13 @@ public class Main2Activity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_channels) {
-           this.setTitle("Lista de Canais");
+            this.state.setState(1);
+            try {
+                saveState(state);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            this.setTitle("Lista de Canais");
             arrayListChannel.clear();
             new Main2Activity.getJson().execute(urlTVChannel);
 
@@ -194,6 +269,8 @@ public class Main2Activity extends AppCompatActivity
 
         } else if (id == R.id.nav_sports) {
             try {
+                this.state.setState(2);
+                saveState(state);
                 this.setTitle("Lista de Desportos");
                 urlSports = new URL("http://www.zerozero.pt/api/v1/getSports/AppKey/7UdS89gI");
                 arrayListSports.clear();
@@ -210,6 +287,8 @@ public class Main2Activity extends AppCompatActivity
                 });
 
             } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -254,7 +333,6 @@ public class Main2Activity extends AppCompatActivity
         return jsonObj;
     }
 
-    @SuppressLint("StaticFieldLeak")
     private class getJson extends AsyncTask<URL, Integer, Long> {
 
         JSONObject jsonObj = null;
@@ -338,6 +416,7 @@ public class Main2Activity extends AppCompatActivity
                 }
             }
             customAdapter.notifyDataSetChanged();
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -408,6 +487,7 @@ public class Main2Activity extends AppCompatActivity
                 }
             }
             sportsAdapter.notifyDataSetChanged();
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -564,5 +644,22 @@ public class Main2Activity extends AppCompatActivity
         if (c!=null)
             val = c.getString(key);
         return val;
+    }
+
+    private void saveState(State state) throws IOException {
+        FileOutputStream fos = getApplicationContext().openFileOutput(FILE_STATE, Context.MODE_PRIVATE);
+        ObjectOutputStream os = new ObjectOutputStream(fos);
+        os.writeObject(state);
+        os.close();
+        fos.close();
+    }
+
+    private State getState() throws IOException, ClassNotFoundException {
+        FileInputStream fis = getApplicationContext().openFileInput(FILE_STATE);
+        ObjectInputStream is = new ObjectInputStream(fis);
+        State myState = (State) is.readObject();
+        is.close();
+        fis.close();
+        return myState;
     }
 }

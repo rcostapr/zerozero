@@ -67,7 +67,7 @@ public class MatchAdapter extends BaseAdapter {
         SimpleDateFormat timeFormat = new SimpleDateFormat("H:mm");
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd - MM - yyyy");
 
-        txtBottom.setText(timeFormat.format(matchDate));
+        txtBottom.setText(this.arrayListChannel.get(i).getChannel()+"     "+timeFormat.format(matchDate));
         txtTop.setText(this.arrayListChannel.get(i).getSports() + "     " + dateFormat.format(matchDate));
         txtHomeTeam.setText(this.arrayListChannel.get(i).getHomeTeam());
         txtAwayTeam.setText(this.arrayListChannel.get(i).getAwayTeam());

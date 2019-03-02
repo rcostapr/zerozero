@@ -13,6 +13,8 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,10 +26,13 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -51,13 +56,36 @@ public class info_channel extends AppCompatActivity {
     private ListView channelList;
     private MatchAdapter matchAdapter;
 
-
+    private static final String FILE_STATE = "out.txt";
+    private State state = new State(1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_channel);
-        setTitle(R.string.backLstChannel);
+
+        File file = getApplicationContext().getFileStreamPath(FILE_STATE);
+        if(file.exists()) {
+            try {
+                Log.d(TAG,"File Exists State -> " + Integer.toString(state.getState()));
+                this.state = getState();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        switch (state.getState()){
+            case 1:
+                this.setTitle("Voltar Lista de Canais");
+                break;
+            case 2:
+                this.setTitle("Voltar Lista de Desportos");
+                break;
+            default:
+                break;
+        }
 
         channelList = findViewById(R.id.lstMatch);
         arrayListChannel = new ArrayList<>();
@@ -408,5 +436,22 @@ public class info_channel extends AppCompatActivity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void saveState(State state) throws IOException {
+        FileOutputStream fos = getApplicationContext().openFileOutput(FILE_STATE, Context.MODE_PRIVATE);
+        ObjectOutputStream os = new ObjectOutputStream(fos);
+        os.writeObject(state);
+        os.close();
+        fos.close();
+    }
+
+    private State getState() throws IOException, ClassNotFoundException {
+        FileInputStream fis = getApplicationContext().openFileInput(FILE_STATE);
+        ObjectInputStream is = new ObjectInputStream(fis);
+        State myState = (State) is.readObject();
+        is.close();
+        fis.close();
+        return myState;
     }
 }

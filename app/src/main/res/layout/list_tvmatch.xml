@@ -68,15 +68,15 @@
 
     <TextView
         android:id="@+id/textVs"
-        android:layout_width="22dp"
-        android:layout_height="30dp"
-        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/txtTop"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
         android:gravity="center"
         android:text="@string/strVs"
         android:textColor="@color/colorPrimaryDark"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
     <ImageView
@@ -127,7 +127,7 @@
         android:layout_marginRight="0dp"
         android:gravity="center"
         android:textColor="@android:color/holo_orange_dark"
-        android:textSize="24sp"
+        android:textSize="18sp"
         android:textStyle="bold" />
 
 </RelativeLayout>

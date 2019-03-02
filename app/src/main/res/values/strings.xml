@@ -2,7 +2,6 @@
     <string name="app_name">Transmissões Desportivas</string>
     <string name="strBtnCanais">Lista de Canais</string>
     <string name="strBtnClose">Fechar</string>
-    <string name="backLstChannel">Voltar Lista de Canais</string>
     <string name="strVs">Vs</string>
     <string name="title_activity_main2">Lista de Canais</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -11,4 +10,5 @@
     <string name="nav_header_subtitle">zerozero@myfeup.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="clean_cache">Clean Cache</string>
 </resources>

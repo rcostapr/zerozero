@@ -57,7 +57,7 @@ public class info_sport extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_channel);
-        setTitle(R.string.backLstChannel);
+        setTitle("Voltar Lista de Desportos");
 
         channelList = findViewById(R.id.lstMatch);
         arrayListChannel = new ArrayList<>();
