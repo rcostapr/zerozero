@@ -7,9 +7,11 @@ import java.util.ArrayList;
 
 public class State implements Serializable {
 
-    int state;
-    boolean internetStatus;
-    boolean WiFi;
+    private int state;
+    private boolean internetStatus;
+    private boolean WiFi;
+    private String idioma = "default";
+    private String idiomaCountry = "default";
     private ArrayList<TvChannel> arrayListChannel = null;
     private ArrayList<Sport> arrayListSports = null;
     private ArrayList<TvChannelList> arrayTvChannelList = new ArrayList<>();
@@ -19,12 +21,28 @@ public class State implements Serializable {
         this.state =state;
     }
 
+    public String getIdiomaCountry() {
+        return idiomaCountry;
+    }
+
+    public void setIdiomaCountry(String idiomaCountry) {
+        this.idiomaCountry = idiomaCountry;
+    }
+
     public boolean isInternetStatus() {
         return internetStatus;
     }
 
     public boolean isWiFi() {
         return WiFi;
+    }
+
+    public String getIdioma() {
+        return idioma;
+    }
+
+    public void setIdioma(String idioma) {
+        this.idioma = idioma;
     }
 
     public ArrayList<TvSportList> getArrayTvSportList() {

@@ -50,6 +50,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -85,6 +86,33 @@ public class Main2Activity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.i("IDIOMA","Locale -> " + Locale.getDefault().getDisplayLanguage()
+                + " - " + Locale.getDefault().getLanguage()
+                + " - " + Locale.getDefault().getCountry()
+                + " - " + Locale.getDefault().getDisplayCountry()
+                + " - " + Locale.getDefault().getDisplayName()
+        );
+
+        // GET File Status
+        File file = getApplicationContext().getFileStreamPath(FILE_STATE);
+        if(file.exists()) {
+            try {
+                Log.i(TAG,"File Exists State -> " + Integer.toString(state.getState()));
+                this.state = getState();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Log.i("IDIOMA", "ENTRY IDIOMA -> "+ state.getIdioma());
+        if(!state.getIdioma().equals("default")) {
+            //Change Application level locale
+            LocaleHelper.setLocale(Main2Activity.this, state.getIdioma(),state.getIdiomaCountry());
+        }
+
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -93,19 +121,6 @@ public class Main2Activity extends AppCompatActivity
         mContext = getApplicationContext();
         mActivity = Main2Activity.this;
         channelList = findViewById(R.id.lst2Canais);
-
-        // GET File Status
-        File file = getApplicationContext().getFileStreamPath(FILE_STATE);
-        if(file.exists()) {
-            try {
-                Log.d(TAG,"File Exists State -> " + Integer.toString(state.getState()));
-                this.state = getState();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
 
         // Setting Favoritos Icon
         fab = findViewById(R.id.fab);
@@ -140,13 +155,13 @@ public class Main2Activity extends AppCompatActivity
         // Progress dialog horizontal style
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         // Progress dialog title
-        mProgressDialog.setTitle("Updating Application");
+        mProgressDialog.setTitle(getString(R.string.updating_application));
         // Progress dialog message
-        mProgressDialog.setMessage("Please wait, we are downloading content...");
+        mProgressDialog.setMessage(getString(R.string.downloading_content));
 
         try {
-            urlTVChannel = new URL("http://www.zerozero.pt/api/v1/getTVChannel/AppKey/6RaJ9G7G/DomainID/pt");
-            urlSports = new URL("http://www.zerozero.pt/api/v1/getSports/AppKey/7UdS89gI");
+            urlTVChannel = new URL(getString(R.string.urlTVChannel));
+            urlSports = new URL(getString(R.string.urlSports));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -174,7 +189,7 @@ public class Main2Activity extends AppCompatActivity
                 });
                 break;
             case 2:
-                this.setTitle("Lista de Desportos");
+                this.setTitle(R.string.sports_list);
                 if(isConnected) {
                     arrayListSports.clear();
                     new Main2Activity.getJsonSports().execute(urlSports);
@@ -241,7 +256,7 @@ public class Main2Activity extends AppCompatActivity
             if(swipeRefreshLayout != null)
                 swipeRefreshLayout.setRefreshing(false);
             // Setting Snackbar
-            Snackbar snackbar = Snackbar.make(view, "Sem ligação à internet", Snackbar.LENGTH_LONG).setAction("Action", null);
+            Snackbar snackbar = Snackbar.make(view, R.string.no_internet, Snackbar.LENGTH_LONG).setAction("Action", null);
             snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorAlert));
             snackbar.show();
         } else {
@@ -285,6 +300,12 @@ public class Main2Activity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent settings = new Intent(mContext, info_settings.class);
+            startActivity(settings);
+            return true;
+        }
+
+        if (id == R.id.action_cleancache){
             return true;
         }
 
@@ -304,7 +325,7 @@ public class Main2Activity extends AppCompatActivity
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            this.setTitle("Lista de Canais");
+            this.setTitle(R.string.channel_list);
 
             boolean isConnected = checkInternetConnection();
 
@@ -328,7 +349,7 @@ public class Main2Activity extends AppCompatActivity
             try {
                 this.state.setState(2);
                 saveState(state);
-                this.setTitle("Lista de Desportos");
+                this.setTitle(R.string.sports_list);
                 boolean isConnected = checkInternetConnection();
 
                 if(isConnected) {

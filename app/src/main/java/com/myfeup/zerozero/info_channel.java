@@ -84,6 +84,11 @@ public class info_channel extends AppCompatActivity {
             }
         }
 
+        if(!state.getIdioma().equals("default")) {
+            //Change Application level locale
+            LocaleHelper.setLocale(info_channel.this, state.getIdioma(),state.getIdiomaCountry());
+        }
+
         switch (state.getState()){
             case 1:
                 this.setTitle("Voltar Lista de Canais");

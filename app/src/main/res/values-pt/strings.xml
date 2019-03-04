@@ -1,16 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Transmissões Desportivas</string>
     <string name="strBtnCanais">Lista de Canais</string>
     <string name="strBtnClose">Fechar</string>
     <string name="strVs">Vs</string>
     <string name="title_activity_main2">Lista de Canais</string>
+    <string name="nav_header_title">Transmissões Desportivas App</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Transmissões Desportivas App</string>
     <string name="nav_header_subtitle">zerozero@myfeup.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
-    <string name="clean_cache">Clean Cache</string>
+    <string name="nav_header_desc">Navegação</string>
+    <string name="action_settings">Configurações</string>
+    <string name="clean_cache">Apagar Cache</string>
     <string name="no_internet">Sem ligação à internet</string>
     <string name="with_internet">Com ligação à internet</string>
     <string name="updating_application">Updating Application</string>
@@ -22,12 +23,12 @@
     <string name="canais">Canais</string>
     <string name="desportos">Desportos</string>
     <string name="app_idioma">App Idioma</string>
-    <string name="idioma_default">idioma_default</string>
-    <string name="idioma_pt">Portuguese</string>
-    <string name="idioma_es">Spanish</string>
-    <string name="idioma_br">Brazilian</string>
+    <string name="idioma_default">Default</string>
+    <string name="idioma_pt">Português</string>
+    <string name="idioma_es">Espanhol</string>
+    <string name="idioma_br">Brasileiro</string>
     <string name="back_to_sports">Voltar Lista de Desportos</string>
-    <string name="updating_app">Updating Application</string>
-    <string name="downloading_new">Please wait, we are downloading new actualization...</string>
+    <string name="updating_app">A actualizar a aplicação</string>
     <string name="urlChannel">http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/pt/SportsID/</string>
+    <string name="downloading_new">A carregar actualizações, por favor espere...</string>
 </resources>

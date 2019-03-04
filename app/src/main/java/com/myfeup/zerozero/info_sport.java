@@ -86,12 +86,17 @@ public class info_sport extends AppCompatActivity {
             }
         }
 
+        if(!state.getIdioma().equals("default")) {
+            //Change Application level locale
+            LocaleHelper.setLocale(info_sport.this, state.getIdioma(),state.getIdiomaCountry());
+        }
+
         switch (state.getState()){
             case 1:
 
                 break;
             case 2:
-                this.setTitle("Voltar Lista de Desportos");
+                this.setTitle(R.string.back_to_sports);
                 break;
             default:
                 break;
@@ -112,9 +117,9 @@ public class info_sport extends AppCompatActivity {
         // Progress dialog horizontal style
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         // Progress dialog title
-        mProgressDialog.setTitle("Updating Application");
+        mProgressDialog.setTitle(getString(R.string.updating_app));
         // Progress dialog message
-        mProgressDialog.setMessage("Please wait, we are downloading new actualization...");
+        mProgressDialog.setMessage(getString(R.string.downloading_new));
 
         Intent intent = getIntent();
         this.tvSport =  (Sport) intent.getSerializableExtra("tvSports");
@@ -126,7 +131,7 @@ public class info_sport extends AppCompatActivity {
         ImageView iv = findViewById(R.id.imgChannelId);
         iv.setImageResource(R.drawable.ic_video_camera);
 
-        this.urlChannel = getUrl("http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/pt/SportsID/"
+        this.urlChannel = getUrl(getString(R.string.urlChannel)
                 + Integer.toString(tvSport.getId()));
 
         swipeRefreshLayout=findViewById(R.id.swiperefreshsport);
@@ -515,7 +520,7 @@ public class info_sport extends AppCompatActivity {
             if(!state.isInternetStatus()) {
                 // Setting Toast
                 Context context = getApplicationContext();
-                CharSequence text = "Sem ligação à internet";
+                CharSequence text = getResources().getText(R.string.no_internet);
                 int duration = Toast.LENGTH_SHORT;
 
                 Toast toast = Toast.makeText(context, text, duration);

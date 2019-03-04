@@ -7,11 +7,11 @@
         <item
             android:id="@+id/nav_channels"
             android:icon="@drawable/ic_video_camera"
-            android:title="Canais" />
+            android:title="@string/canais" />
         <item
             android:id="@+id/nav_sports"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Desportos" />
+            android:title="@string/desportos" />
         <item
             android:id="@+id/nav_teams"
             android:icon="@drawable/ic_menu_slideshow"
