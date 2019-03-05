@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -91,7 +92,7 @@ public class info_channel extends AppCompatActivity {
 
         switch (state.getState()){
             case 1:
-                this.setTitle("Voltar Lista de Canais");
+                this.setTitle(getResources().getText(R.string.back_to_channels));
                 break;
             case 2:
                 break;
@@ -103,6 +104,15 @@ public class info_channel extends AppCompatActivity {
         arrayListChannel = new ArrayList<>();
         matchAdapter = new MatchAdapter(this,arrayListChannel);
         channelList.setAdapter(matchAdapter);
+        channelList.setClickable(true);
+        channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
+                Intent infoMatch = new Intent(mContext, MatchInfo.class);
+                infoMatch.putExtra("tvMatch",arrayListChannel.get(i));
+                startActivity(infoMatch);
+            }
+        });
 
         // Get the application context
         mContext = getApplicationContext();
@@ -143,7 +153,6 @@ public class info_channel extends AppCompatActivity {
                     arrayListChannel.clear();
                     new getJson().execute(urlChannel);
                 } else {
-                    // TODO
                     importTvListFromCache();
                 }
             }
@@ -152,7 +161,7 @@ public class info_channel extends AppCompatActivity {
         if (isConnected) {
             new getJson().execute(this.urlChannel);
         } else {
-            // TODO Try to get from cache
+            //Try to get from cache
             importTvListFromCache();
         }
     }

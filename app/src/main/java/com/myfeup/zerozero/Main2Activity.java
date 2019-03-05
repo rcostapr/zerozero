@@ -382,6 +382,98 @@ public class Main2Activity extends AppCompatActivity
 
         } else if (id == R.id.nav_close) {
             android.os.Process.killProcess(android.os.Process.myPid());
+        } else if (id == R.id.nav_calendar) {
+            ArrayList<CalendarCell> arrayListCalendar = new ArrayList<>();
+            ArrayList<String> dayEvents = new ArrayList<>();
+
+            dayEvents.add("event01");
+            dayEvents.add("event02");
+            dayEvents.add("event03");
+            dayEvents.add("event04");
+            dayEvents.add("event05");
+
+            CalendarCell item01 = new CalendarCell(1,dayEvents);
+            CalendarCell item02 = new CalendarCell(2,dayEvents);
+            CalendarCell item03 = new CalendarCell(3,dayEvents);
+            CalendarCell item04 = new CalendarCell(4,dayEvents);
+            CalendarCell item05 = new CalendarCell(5,dayEvents);
+            CalendarCell item06 = new CalendarCell(6,dayEvents);
+            CalendarCell item07 = new CalendarCell(7,dayEvents);
+            CalendarCell item08 = new CalendarCell(8,dayEvents);
+            CalendarCell item09 = new CalendarCell(9,dayEvents);
+            CalendarCell item10 = new CalendarCell(10,dayEvents);
+            CalendarCell item11 = new CalendarCell(11,dayEvents);
+            CalendarCell item12 = new CalendarCell(12,dayEvents);
+            CalendarCell item13 = new CalendarCell(13,dayEvents);
+            CalendarCell item14 = new CalendarCell(14,dayEvents);
+            CalendarCell item15 = new CalendarCell(15,dayEvents);
+            CalendarCell item16 = new CalendarCell(16,dayEvents);
+            CalendarCell item17 = new CalendarCell(17,dayEvents);
+            CalendarCell item18 = new CalendarCell(18,dayEvents);
+            CalendarCell item19 = new CalendarCell(19,dayEvents);
+            CalendarCell item20 = new CalendarCell(20,dayEvents);
+            CalendarCell item21 = new CalendarCell(21,dayEvents);
+            CalendarCell item22 = new CalendarCell(22,dayEvents);
+            CalendarCell item23 = new CalendarCell(23,dayEvents);
+            CalendarCell item24 = new CalendarCell(24,dayEvents);
+            CalendarCell item25 = new CalendarCell(25,dayEvents);
+            CalendarCell item26 = new CalendarCell(26,dayEvents);
+            CalendarCell item27 = new CalendarCell(27,dayEvents);
+            CalendarCell item28 = new CalendarCell(28,dayEvents);
+            CalendarCell item29 = new CalendarCell(29,dayEvents);
+            CalendarCell item30 = new CalendarCell(30,dayEvents);
+            CalendarCell item31 = new CalendarCell(31,dayEvents);
+
+
+
+            arrayListCalendar.add(item27);
+            arrayListCalendar.add(item28);
+            arrayListCalendar.add(item29);
+            arrayListCalendar.add(item30);
+            arrayListCalendar.add(item31);
+            arrayListCalendar.add(item01);
+            arrayListCalendar.add(item02);
+            arrayListCalendar.add(item03);
+            arrayListCalendar.add(item04);
+            arrayListCalendar.add(item05);
+            arrayListCalendar.add(item06);
+            arrayListCalendar.add(item07);
+            arrayListCalendar.add(item08);
+            arrayListCalendar.add(item09);
+            arrayListCalendar.add(item10);
+            arrayListCalendar.add(item11);
+            arrayListCalendar.add(item12);
+            arrayListCalendar.add(item13);
+            arrayListCalendar.add(item14);
+            arrayListCalendar.add(item15);
+            arrayListCalendar.add(item16);
+            arrayListCalendar.add(item17);
+            arrayListCalendar.add(item18);
+            arrayListCalendar.add(item19);
+            arrayListCalendar.add(item20);
+            arrayListCalendar.add(item21);
+            arrayListCalendar.add(item22);
+            arrayListCalendar.add(item23);
+            arrayListCalendar.add(item24);
+            arrayListCalendar.add(item25);
+            arrayListCalendar.add(item26);
+            arrayListCalendar.add(item27);
+            arrayListCalendar.add(item28);
+            arrayListCalendar.add(item29);
+            arrayListCalendar.add(item30);
+            arrayListCalendar.add(item31);
+            arrayListCalendar.add(item01);
+            arrayListCalendar.add(item02);
+            arrayListCalendar.add(item03);
+            arrayListCalendar.add(item04);
+            arrayListCalendar.add(item05);
+            arrayListCalendar.add(item06);
+
+
+
+            Intent calendar = new Intent(mContext, CalendarActivity.class);
+            calendar.putExtra("calendarList", arrayListCalendar);
+            startActivity(calendar);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

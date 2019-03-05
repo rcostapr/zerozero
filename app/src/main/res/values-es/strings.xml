@@ -31,4 +31,8 @@
     <string name="updating_app">Aplicación de actualización</string>
     <string name="urlChannel">http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/es/SportsID/</string>
     <string name="downloading_new">Por favor espere, estamos descargando nueva actualización ...</string>
+    <string name="back_to_channels">Volver Lista de Canales</string>
+    <string name="resultados_anteriores">Resultados Anteriores</string>
+    <string name="odds_do_jogo">Cuotas del Juego</string>
+    <string name="title_activity_match_info">Información del Juego</string>
 </resources>

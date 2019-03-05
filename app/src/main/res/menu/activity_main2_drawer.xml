@@ -17,6 +17,10 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Clubes" />
         <item
+            android:id="@+id/nav_calendar"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Calendário" />
+        <item
             android:id="@+id/nav_login"
             android:icon="@drawable/ic_menu_manage"
             android:title="Login" />

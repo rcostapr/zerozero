@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:uiOptions="splitActionBarWhenNarrow"
+    tools:context=".MatchInfo">
+    <item
+        android:id="@+id/match_info_action_BackSports"
+        android:orderInCategory="200"
+        android:title="Sports"
+        android:icon="@drawable/ic_list_ol"
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/match_info_action_BackCalendar"
+        android:orderInCategory="300"
+        android:title="Search"
+        android:icon="@drawable/ic_calendar"
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/match_info_action_user"
+        android:orderInCategory="400"
+        android:title="User"
+        android:icon="@drawable/ic_user"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/match_info_action_camera"
+        android:orderInCategory="500"
+        android:title="User"
+        android:icon="@drawable/ic_video_camera"
+        app:showAsAction="always" />
+
+</menu>

@@ -8,4 +8,8 @@
     <color name="colorBlack">#000000</color>
     <color name="colorAlert">#FF0303</color>
     <color name="colorOks">#109E00</color>
+    <color name="cursorAccent">#FFC107</color>
+    <color name="controlNormal">#D8B2A6</color>
+    <color name="controlActivated">#3F51B5</color>
+    <color name="colorWhite">#FFFFFF</color>
 </resources>

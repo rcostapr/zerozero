@@ -15,4 +15,6 @@
     <string name="back_to_sports">Voltar Lista de Desportos</string>
     <string name="updating_app">Updating Application</string>
     <string name="urlChannel">http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/pt/SportsID/</string>
+    <string name="resultados_anteriores">Resultados Anteriores</string>
+    <string name="odds_do_jogo">Odds do Jogo</string>
 </resources>

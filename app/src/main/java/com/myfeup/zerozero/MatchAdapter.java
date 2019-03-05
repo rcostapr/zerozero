@@ -55,7 +55,6 @@ public class MatchAdapter extends BaseAdapter {
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-
         Date matchDate = null;
         try {
             matchDate = format.parse(arrayListChannel.get(i).getMatchDay());
