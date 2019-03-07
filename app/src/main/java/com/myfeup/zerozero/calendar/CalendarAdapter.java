@@ -90,20 +90,24 @@ public class CalendarAdapter extends BaseAdapter {
                 RelativeLayout circleView = v.findViewById(R.id.circleTop);
                 if(circleView.getBackground().getConstantState().equals(context.getDrawable(R.drawable.calendar_circle).getConstantState())) {
                     Log.i("GRIDELEMENT", "ITEM Go to Match ->"+circleView.toString() + " Day " + match.getDay());
-                    Intent infoMatch = new Intent(context, MatchInfo.class);
-                    Match matchDay = match.getMatch();
-                    infoMatch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    infoMatch.putExtra("tvMatch", matchDay);
-                    context.startActivity(infoMatch);
+                    if(match.getMatch()!=null) {
+                        Intent infoMatch = new Intent(context, MatchInfo.class);
+                        Match matchDay = match.getMatch();
+                        infoMatch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        infoMatch.putExtra("tvMatch", matchDay);
+                        context.startActivity(infoMatch);
+                    }
                 }
 
                 if(circleView.getBackground().getConstantState().equals(context.getDrawable(R.drawable.calendar_circle_fill).getConstantState())) {
                     Log.i("GRIDELEMENT", "ITEM Fill Go to Match ->"+circleView.toString() + " Day " + match.getDay());
-                    Intent infoMatch = new Intent(context, MatchInfo.class);
-                    Match matchDay = match.getMatch();
-                    infoMatch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    infoMatch.putExtra("tvMatch", matchDay);
-                    context.startActivity(infoMatch);
+                    if(match.getMatch()!=null) {
+                        Intent infoMatch = new Intent(context, MatchInfo.class);
+                        Match matchDay = match.getMatch();
+                        infoMatch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        infoMatch.putExtra("tvMatch", matchDay);
+                        context.startActivity(infoMatch);
+                    }
                 }
 
                 GridView calendarGrid = (GridView) v.getParent();
