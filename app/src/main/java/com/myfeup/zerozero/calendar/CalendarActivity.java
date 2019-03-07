@@ -2,17 +2,16 @@ package com.myfeup.zerozero.calendar;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.myfeup.zerozero.LocaleHelper;
 import com.myfeup.zerozero.R;
@@ -26,7 +25,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
 
 public class CalendarActivity extends AppCompatActivity {
 
@@ -79,7 +77,8 @@ public class CalendarActivity extends AppCompatActivity {
         ImageView previousMonth = findViewById(R.id.imageViewLeft);
         TextView txtMonth = findViewById(R.id.textMonth);
 
-        txtMonth.setText(cal.getDisplayName(Calendar.MONTH,Calendar.LONG,context.getResources().getConfiguration().locale));
+        txtMonth.setText(cal.getDisplayName(Calendar.MONTH,Calendar.LONG,context.getResources().getConfiguration().locale)
+        + " " + calendarItem.getYear());
 
         ArrayList<String> weeksNames = new ArrayList<>();
         weeksNames.add("Seg");
@@ -134,6 +133,13 @@ public class CalendarActivity extends AppCompatActivity {
                 startActivity(calendar);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.calendar_menu, menu);
+        return true;
     }
 
     private void saveState(State state) throws IOException {

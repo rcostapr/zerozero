@@ -44,7 +44,6 @@ public class MatchInfo extends AppCompatActivity {
         mContext = getApplicationContext();
 
         Toolbar toolbar = findViewById(R.id.toolbar_Match_Info);
-
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = findViewById(R.id.fab_Match_Info);
