@@ -55,12 +55,14 @@ public class CalendarCellAdapter extends BaseAdapter {
         switch (position){
             case 0:
                 dayEventRow.setTextColor(context.getResources().getColor(R.color.colorPrimaryDark));
+                dayEventRow.setTypeface(null, Typeface.BOLD);
                 break;
             case 1:
                 dayEventRow.setTextColor(context.getResources().getColor(R.color.colorPrimary));
                 break;
             case 2:
                 dayEventRow.setTextColor(context.getResources().getColor(R.color.colorPrimaryDark));
+                dayEventRow.setTypeface(null, Typeface.BOLD);
                 break;
             case 3:
                 dayEventRow.setTextColor(context.getResources().getColor(R.color.colorOks));

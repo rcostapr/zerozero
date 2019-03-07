@@ -1,5 +1,7 @@
 package com.myfeup.zerozero.calendar;
 
+import com.myfeup.zerozero.Match;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,6 +11,7 @@ class CalendarCell implements Serializable {
     int day;
     int month;
     int year;
+    Match match = null;
     boolean today = false;
     boolean dayOfThisMonth = true;
     ArrayList<String> dayListEvents;
@@ -27,6 +30,19 @@ class CalendarCell implements Serializable {
         nCal.set(Calendar.YEAR,year);
         return nCal.get(Calendar.DAY_OF_WEEK);
     }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public Match getMatch() {
+        return match;
+    }
+
+    public void setMatch(Match match) {
+        this.match = match;
+    }
+
     public int getYear() {
         return year;
     }

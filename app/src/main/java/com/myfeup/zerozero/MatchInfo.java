@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.myfeup.zerozero.calendar.CalendarActivity;
@@ -95,7 +96,10 @@ public class MatchInfo extends AppCompatActivity {
             iva.setImageURI(Uri.parse(tvMatch.getAbsfileImgAwayTeam()));
         }
 
-        matchInfoHomeTeam.setOnClickListener(new View.OnClickListener() {
+        RelativeLayout hr = (RelativeLayout) matchInfoHomeTeam.getParent();
+        hr.setClickable(true);
+
+        hr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Date now = new Date();
@@ -107,7 +111,11 @@ public class MatchInfo extends AppCompatActivity {
                 startActivity(calendar);
             }
         });
-        matchInfoAwayTeam.setOnClickListener(new View.OnClickListener() {
+
+        RelativeLayout ar = (RelativeLayout) matchInfoAwayTeam.getParent();
+        ar.setClickable(true);
+
+        ar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Date now = new Date();

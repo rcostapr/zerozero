@@ -158,6 +158,7 @@ public class TeamCalendar {
 
         while (!(cal.get(Calendar.MONTH) == this.lastMonth && cal.get(Calendar.DAY_OF_MONTH) == this.lastDay)){
             ArrayList<String> dayEvents = new ArrayList<>();
+            Match match = null;
             //Log.i("MATCH", "GAMES -> " + arrayListChannel.size());
             for(int k=0;k<arrayListChannel.size();k++){
                 Match matchDay = arrayListChannel.get(k);
@@ -182,9 +183,11 @@ public class TeamCalendar {
                     dayEvents.add(matchDay.getAwayTeam());
                     dayEvents.add(matchDay.getChannel());
                     dayEvents.add(timeFormat.format(matchDate));
+                    match = matchDay;
                 }
             }
             CalendarCell item = new CalendarCell(cal.get(Calendar.DAY_OF_MONTH),cal.get(Calendar.MONTH),cal.get(Calendar.YEAR),dayEvents);
+            item.setMatch(match);
             if(cal.get(Calendar.MONTH)!=iniMonth){
                 item.setDayOfThisMonth(false);
             }
