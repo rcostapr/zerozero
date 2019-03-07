@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="20sp"
+    android:background="@drawable/calendar_cell_border">
+
+    <TextView
+        android:id="@+id/textWeekName"
+        android:layout_width="match_parent"
+        android:layout_height="30sp"
+        android:background="@color/colorGrey"
+        android:textColor="@color/colorWhite"
+        android:textSize="10sp"
+        android:gravity="center"
+        android:text="TextView" />
+</RelativeLayout>

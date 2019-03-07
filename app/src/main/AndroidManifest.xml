@@ -70,7 +70,7 @@
                 android:value=".info_settings" />
         </activity>
         <activity
-            android:name=".CalendarActivity"
+            android:name=".calendar.CalendarActivity"
             android:parentActivityName=".Main2Activity">
 
             <!-- The meta-data tag is required if you support API level 15 and lower -->

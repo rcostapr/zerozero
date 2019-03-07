@@ -2,7 +2,7 @@ package com.myfeup.zerozero;
 
 import java.io.Serializable;
 
-class Match implements Serializable {
+public class Match implements Serializable {
 
     private int matchId;
     private int channelId;
@@ -20,7 +20,7 @@ class Match implements Serializable {
     private String absfileImgHomeTeam;
     private String absfileImgAwayTeam;
 
-    Match(int matchId, int channelId, String domain, String matchDay, int homeTeamId, int awayTeamId, String homeTeam, String awayTeam, int sportsId, String channel, String sports) {
+    public Match(int matchId, int channelId, String domain, String matchDay, int homeTeamId, int awayTeamId, String homeTeam, String awayTeam, int sportsId, String channel, String sports) {
         this.matchDay=matchDay;
         this.matchId=matchId;
         this.channelId=channelId;

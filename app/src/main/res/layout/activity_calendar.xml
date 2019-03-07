@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".CalendarActivity">
+    tools:context=".calendar.CalendarActivity">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -15,17 +15,17 @@
 
 
         <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/imageViewLeft"
+            android:layout_width="50sp"
+            android:layout_height="50sp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="15dp"
-            app:srcCompat="@android:drawable/arrow_down_float" />
+            android:layout_marginTop="0dp"
+            app:srcCompat="@drawable/ic_angle_left" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/textMonth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -33,22 +33,43 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
-            android:layout_toStartOf="@+id/imageView4"
-            android:layout_toEndOf="@+id/imageView3"
+            android:layout_toStartOf="@+id/imageViewRight"
+            android:layout_toEndOf="@+id/imageViewLeft"
             android:text="Dezembro"
             android:textAlignment="center"
             android:textSize="24sp"
             android:textStyle="bold" />
 
         <ImageView
-            android:id="@+id/imageView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/imageViewRight"
+            android:layout_width="50sp"
+            android:layout_height="50sp"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="0dp"
             android:layout_marginEnd="10dp"
-            app:srcCompat="@android:drawable/arrow_up_float" />
+            app:srcCompat="@drawable/ic_angle_right" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <GridView
+            android:id="@+id/dCalendarTop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:stretchMode="columnWidth"
+            android:numColumns="7"
+            android:textAlignment="center"
+            android:verticalSpacing="0sp"
+            android:horizontalSpacing="0sp"
+            android:minHeight="20sp"
+            android:paddingLeft="0sp"
+            android:background="@drawable/calendar_cell_border"
+            />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -71,5 +92,13 @@
             />
 
     </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_Calendar_Info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/ic_input_add" />
 
 </LinearLayout>

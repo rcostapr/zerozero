@@ -16,8 +16,9 @@ public class State implements Serializable {
     private ArrayList<Sport> arrayListSports = null;
     private ArrayList<TvChannelList> arrayTvChannelList = new ArrayList<>();
     private ArrayList<TvSportList> arrayTvSportList = new ArrayList<>();
+    private ArrayList<TvTeamList> arrayTvTeamList = new ArrayList<>();
 
-    State(int state){
+    public State(int state){
         this.state =state;
     }
 
@@ -35,6 +36,14 @@ public class State implements Serializable {
 
     public boolean isWiFi() {
         return WiFi;
+    }
+
+    public ArrayList<TvTeamList> getArrayTvTeamList() {
+        return arrayTvTeamList;
+    }
+
+    public void setArrayTvTeamList(ArrayList<TvTeamList> arrayTvTeamList) {
+        this.arrayTvTeamList = arrayTvTeamList;
     }
 
     public String getIdioma() {
@@ -93,6 +102,23 @@ public class State implements Serializable {
             arrayTvChannelList.add(tvChannelList);
         }
         Log.d("ArrayTvChannelList","SIZE -> " + arrayTvChannelList.size());
+    }
+
+    public void addArrayTvTeamList(TvTeamList tvTeamList) {
+        boolean found = false;
+        if(arrayTvTeamList!=null) {
+            for (int k = 0; k < this.arrayTvTeamList.size(); k++) {
+                if (arrayTvTeamList.get(k).getId() == tvTeamList.getId()) {
+                    arrayTvTeamList.get(k).setArrayListChannel(tvTeamList.getArrayListChannel());
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if(!found){
+            arrayTvTeamList.add(tvTeamList);
+        }
+        Log.d("ArrayTvTeamList","SIZE -> " + arrayTvTeamList.size());
     }
 
     public ArrayList<TvChannel> getArrayListChannel() {

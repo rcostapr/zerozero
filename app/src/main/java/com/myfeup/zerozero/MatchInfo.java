@@ -1,5 +1,6 @@
 package com.myfeup.zerozero;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,19 +14,36 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.myfeup.zerozero.calendar.CalendarActivity;
+import com.myfeup.zerozero.calendar.CalendarItem;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class MatchInfo extends AppCompatActivity {
 
     private Match tvMatch;
+    private Context mContext;
+    private static final String FILE_STATE = "out.txt";
+    private State state = new State(1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match_info);
+
+        // Get the application context
+        mContext = getApplicationContext();
+
         Toolbar toolbar = findViewById(R.id.toolbar_Match_Info);
+
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = findViewById(R.id.fab_Match_Info);
@@ -63,6 +81,7 @@ public class MatchInfo extends AppCompatActivity {
         matchInfoCanal.setText(tvMatch.getChannel()+"     "+timeFormat.format(matchDate));
         matchInfoSport.setText(tvMatch.getSports());
         matchInfoData.setText(dateFormat.format(matchDate));
+
         matchInfoHomeTeam.setText(tvMatch.getHomeTeam());
         matchInfoAwayTeam.setText(tvMatch.getAwayTeam());
 
@@ -75,6 +94,31 @@ public class MatchInfo extends AppCompatActivity {
             ImageView iva = findViewById(R.id.match_Info_imgAwayTeam);
             iva.setImageURI(Uri.parse(tvMatch.getAbsfileImgAwayTeam()));
         }
+
+        matchInfoHomeTeam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date now = new Date();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(now);
+                CalendarItem calendarItem = new CalendarItem(cal.get(Calendar.MONTH),cal.get(Calendar.YEAR),tvMatch.getHomeTeamId(),tvMatch.getHomeTeam());
+                Intent calendar = new Intent(mContext, CalendarActivity.class);
+                calendar.putExtra("calendarItem", calendarItem);
+                startActivity(calendar);
+            }
+        });
+        matchInfoAwayTeam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date now = new Date();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(now);
+                CalendarItem calendarItem = new CalendarItem(cal.get(Calendar.MONTH),cal.get(Calendar.YEAR),tvMatch.getAwayTeamId(),tvMatch.getAwayTeam());
+                Intent calendar = new Intent(mContext, CalendarActivity.class);
+                calendar.putExtra("calendarItem", calendarItem);
+                startActivity(calendar);
+            }
+        });
 
     }
 
@@ -92,12 +136,60 @@ public class MatchInfo extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        try {
+            this.state = getState();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
+        if (id == R.id.match_info_action_camera) {
+            state.setState(1);
+            try {
+                saveState(state);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Intent nIntent = new Intent(mContext, Main2Activity.class);
+            startActivity(nIntent);
+            return true;
+        }
+        if (id == R.id.match_info_action_BackSports) {
+            state.setState(2);
+            try {
+                saveState(state);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Intent nIntent = new Intent(mContext, Main2Activity.class);
+            startActivity(nIntent);
+            return true;
+        }
+        if (id == R.id.match_info_action_BackCalendar) {
+            return true;
+        }
+        if (id == R.id.match_info_action_user) {
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void saveState(State state) throws IOException {
+        FileOutputStream fos = getApplicationContext().openFileOutput(FILE_STATE, Context.MODE_PRIVATE);
+        ObjectOutputStream os = new ObjectOutputStream(fos);
+        os.writeObject(state);
+        os.close();
+        fos.close();
+    }
+
+    private State getState() throws IOException, ClassNotFoundException {
+        FileInputStream fis = getApplicationContext().openFileInput(FILE_STATE);
+        ObjectInputStream is = new ObjectInputStream(fis);
+        State myState = (State) is.readObject();
+        is.close();
+        fis.close();
+        return myState;
     }
 
 }

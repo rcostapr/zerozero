@@ -12,4 +12,6 @@
     <color name="controlNormal">#D8B2A6</color>
     <color name="controlActivated">#3F51B5</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="colorGrey">#C0BFBF</color>
+    <color name="colorBlackLight">#3D3C3C</color>
 </resources>

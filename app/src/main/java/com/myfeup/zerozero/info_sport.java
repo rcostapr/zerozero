@@ -18,6 +18,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -106,6 +107,15 @@ public class info_sport extends AppCompatActivity {
         arrayListChannel = new ArrayList<>();
         matchAdapter = new MatchAdapter(this,arrayListChannel);
         channelList.setAdapter(matchAdapter);
+        channelList.setClickable(true);
+        channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
+                Intent infoMatch = new Intent(mContext, MatchInfo.class);
+                infoMatch.putExtra("tvMatch",arrayListChannel.get(i));
+                startActivity(infoMatch);
+            }
+        });
 
         // Get the application context
         mContext = getApplicationContext();

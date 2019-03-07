@@ -3,12 +3,12 @@ package com.myfeup.zerozero;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class TvSportList implements Serializable {
+public class TvTeamList implements Serializable {
 
     int Id;
     ArrayList<Match> arrayListChannel;
 
-    public TvSportList(int Id, ArrayList<Match> arrayListChannel){
+    public TvTeamList(int Id, ArrayList<Match> arrayListChannel){
         this.Id = Id;
         this.arrayListChannel = arrayListChannel;
     }

@@ -2,7 +2,7 @@ package com.myfeup.zerozero;
 
 import java.io.Serializable;
 
-class Sport implements Serializable {
+public class Sport implements Serializable {
     private int Id;
     private String name;
     private String shortname;
@@ -31,7 +31,7 @@ class Sport implements Serializable {
         this.shortname = shortname;
     }
 
-    Sport(int Id, String name, String shortname) {
+    public Sport(int Id, String name, String shortname) {
         this.Id = Id;
         this.name = name;
         this.shortname=shortname;

@@ -5,6 +5,14 @@
     android:layout_width="match_parent"
     android:uiOptions="splitActionBarWhenNarrow"
     tools:context=".MatchInfo">
+
+    <item
+        android:id="@+id/match_info_action_camera"
+        android:orderInCategory="100"
+        android:title="User"
+        android:icon="@drawable/ic_video_camera"
+        app:showAsAction="always" />
+
     <item
         android:id="@+id/match_info_action_BackSports"
         android:orderInCategory="200"
@@ -26,11 +34,5 @@
         android:icon="@drawable/ic_user"
         app:showAsAction="always" />
 
-    <item
-        android:id="@+id/match_info_action_camera"
-        android:orderInCategory="500"
-        android:title="User"
-        android:icon="@drawable/ic_video_camera"
-        app:showAsAction="always" />
 
 </menu>

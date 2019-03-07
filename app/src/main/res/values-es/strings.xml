@@ -35,4 +35,5 @@
     <string name="resultados_anteriores">Resultados Anteriores</string>
     <string name="odds_do_jogo">Cuotas del Juego</string>
     <string name="title_activity_match_info">Información del Juego</string>
+    <string name="urlTeam">http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/es/TeamID/</string>
 </resources>
