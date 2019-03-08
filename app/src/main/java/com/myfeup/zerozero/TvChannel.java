@@ -3,6 +3,8 @@ package com.myfeup.zerozero;
 import android.net.Uri;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class TvChannel implements Serializable {
 
@@ -13,6 +15,7 @@ public class TvChannel implements Serializable {
     private int imgHeight;
     private String domain;
     private String absImgFileName;
+    private Date listDate = new Date();
 
     public String getAbsImgFileName() {
         return absImgFileName;
@@ -77,5 +80,11 @@ public class TvChannel implements Serializable {
 
     public void setImgHeight(int imgHeight) {
         this.imgHeight = imgHeight;
+    }
+
+    public long getDiffMinutes(Date compareDate){
+        long diffInMillies = Math.abs(compareDate.getTime() - listDate.getTime());
+        long diff = TimeUnit.MINUTES.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        return diff;
     }
 }
