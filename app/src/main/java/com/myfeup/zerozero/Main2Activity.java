@@ -78,6 +78,7 @@ public class Main2Activity extends AppCompatActivity
     private JSONObject jsonSports = null;
 
     private static final String DISK_CACHE_SUBDIR = "Images";
+    private static final String DISK_CACHE_TEAMS = "Teams";
     private static final String FILE_STATE = "out.txt";
     private static final String COLOR_BACKGROUND = "#FF4081";
 
@@ -312,6 +313,7 @@ public class Main2Activity extends AppCompatActivity
         }
 
         if (id == R.id.action_cleancache){
+            cleanCache();
             return true;
         }
 
@@ -767,5 +769,33 @@ public class Main2Activity extends AppCompatActivity
         is.close();
         fis.close();
         return myState;
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+            return dir.delete();
+        } else if(dir!= null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
+        }
+    }
+    private void cleanCache(){
+        try {
+            ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
+            File dirImages = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);
+            File dirTeams = wrapper.getDir(DISK_CACHE_TEAMS,MODE_PRIVATE);
+            deleteDir(dirImages);
+            deleteDir(dirTeams);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
