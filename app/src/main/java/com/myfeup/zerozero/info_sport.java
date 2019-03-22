@@ -105,7 +105,7 @@ public class info_sport extends AppCompatActivity {
 
         channelList = findViewById(R.id.lstMatch);
         arrayListChannel = new ArrayList<>();
-        matchAdapter = new MatchAdapter(this,arrayListChannel);
+        matchAdapter = new MatchAdapter(this,arrayListChannel, state);
         channelList.setAdapter(matchAdapter);
         channelList.setClickable(true);
         channelList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -549,7 +549,7 @@ public class info_sport extends AppCompatActivity {
         for(int k=0;k<arrayTvSportList.size();k++){
             if(arrayTvSportList.get(k).getId()==tvSport.getId()){
                 this.arrayListChannel = arrayTvSportList.get(k).getArrayListChannel();
-                matchAdapter = new MatchAdapter(this,arrayListChannel);
+                matchAdapter = new MatchAdapter(this,arrayListChannel, state);
                 channelList.setAdapter(matchAdapter);
                 break;
             }

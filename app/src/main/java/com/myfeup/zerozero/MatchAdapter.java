@@ -2,7 +2,6 @@ package com.myfeup.zerozero;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,15 +17,15 @@ import java.util.Date;
 
 public class MatchAdapter extends BaseAdapter {
 
-    private static final String FILE_STATE = "out.txt";
-
     private Context context;
     private ArrayList<Match> arrayListChannel;
     private ViewGroup parent;
+    private State state;
 
-    public MatchAdapter(Context context, ArrayList<Match> array){
+    public MatchAdapter(Context context, ArrayList<Match> array, State state){
         this.arrayListChannel=array;
         this.context = context;
+        this.state = state;
     }
     @Override
     public int getCount() {
@@ -138,27 +133,14 @@ public class MatchAdapter extends BaseAdapter {
                 TextView txtTvChannel = convertView.findViewById(R.id.txtTvChannel);
                 txtTvChannel.setText(this.arrayListChannel.get(i).getChannel());
 
-                File file = context.getFileStreamPath(FILE_STATE);
-                State state = new State(1);
-                if(file.exists()) {
-                    try {
-                         state = getState();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-                    ArrayList<TvChannel> tvChannels = state.getArrayListChannel();
-                    for(int k = 0; k< tvChannels.size();k++){
-                        if(tvChannels.get(k).getId()==this.arrayListChannel.get(i).getChannelId()){
-                            if(tvChannels.get(k).getAbsImgFileName()!= null) {
-                                ImageView ivhT = convertView.findViewById(R.id.imgTvChannel);
-                                ivhT.setImageURI(Uri.parse(tvChannels.get(k).getAbsImgFileName()));
-                            }
+                ArrayList<TvChannel> tvChannels = state.getArrayListChannel();
+                for(int k = 0; k< tvChannels.size();k++){
+                    if(tvChannels.get(k).getId()==this.arrayListChannel.get(i).getChannelId()){
+                        if(tvChannels.get(k).getAbsImgFileName()!= null) {
+                            ImageView ivhT = convertView.findViewById(R.id.imgTvChannel);
+                            ivhT.setImageURI(Uri.parse(tvChannels.get(k).getAbsImgFileName()));
                         }
                     }
-
                 }
                 break;
         }
@@ -167,14 +149,6 @@ public class MatchAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private State getState() throws IOException, ClassNotFoundException {
-        FileInputStream fis = context.openFileInput(FILE_STATE);
-        ObjectInputStream is = new ObjectInputStream(fis);
-        State myState = (State) is.readObject();
-        is.close();
-        fis.close();
-        return myState;
-    }
     public static boolean isToday(Date date){
         Calendar today = Calendar.getInstance();
         Calendar specifiedDate  = Calendar.getInstance();
