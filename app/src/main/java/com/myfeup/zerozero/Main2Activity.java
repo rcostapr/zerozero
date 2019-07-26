@@ -70,10 +70,10 @@ public class Main2Activity extends AppCompatActivity
 
     private ListView channelList;
     private ArrayList<TvChannel> arrayListChannel;
-    private ArrayList<Sport> arrayListSports;
+    private ArrayList<Competition> arrayListSports;
 
     private URL urlTVChannel = null;
-    private URL urlSports = null;
+    private URL urlCompetitions = null;
     private JSONObject jsonTVChannel = null;
     private JSONObject jsonSports = null;
 
@@ -129,7 +129,7 @@ public class Main2Activity extends AppCompatActivity
         mActivity = Main2Activity.this;
         channelList = findViewById(R.id.lst2Canais);
 
-        // Setting Favoritos Icon
+        // Setting Favorites Icon
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,7 +168,7 @@ public class Main2Activity extends AppCompatActivity
 
         try {
             urlTVChannel = new URL(getString(R.string.urlTVChannel));
-            urlSports = new URL(getString(R.string.urlSports));
+            urlCompetitions = new URL(getString(R.string.urlCompetitions));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -199,7 +199,7 @@ public class Main2Activity extends AppCompatActivity
                 this.setTitle(R.string.sports_list);
                 if(isConnected) {
                     arrayListSports.clear();
-                    new Main2Activity.getJsonSports().execute(urlSports);
+                    new Main2Activity.getJsonSports().execute(urlCompetitions);
                 } else {
                     this.arrayListSports = state.getArrayListSports();
                     sportsAdapter = new SportsAdapter(this,arrayListSports);
@@ -237,7 +237,7 @@ public class Main2Activity extends AppCompatActivity
                             break;
                         case 2:
                             arrayListSports.clear();
-                            new Main2Activity.getJsonSports().execute(urlSports);
+                            new Main2Activity.getJsonSports().execute(urlCompetitions);
                             break;
                         default:
                             break;
@@ -362,7 +362,7 @@ public class Main2Activity extends AppCompatActivity
 
                 if(isConnected) {
                     arrayListSports.clear();
-                    new Main2Activity.getJsonSports().execute(urlSports);
+                    new Main2Activity.getJsonSports().execute(urlCompetitions);
                 } else {
                     this.arrayListSports = state.getArrayListSports();
                     sportsAdapter = new SportsAdapter(this,arrayListSports);
@@ -466,7 +466,7 @@ public class Main2Activity extends AppCompatActivity
             }
             JSONArray tvchannels = null;
             try {
-                tvchannels = mydata.getJSONArray("TVCHANNEL");
+                tvchannels = mydata.getJSONArray("data");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -481,19 +481,17 @@ public class Main2Activity extends AppCompatActivity
                 }
 
                 try {
-                    String channel_id = getJsonString(c,"CHANNELID");
-                    String channel = getJsonString(c,"CHANNEL");
-                    String domain = getJsonString(c,"DOMAIN");
-                    String img_path = getJsonString(c,"IMGPATH");
-                    String img_height = getJsonString(c,"IMGHEIGHT");
-                    String img_width = getJsonString(c,"IMGWIDTH");
+                    String channel_id = getJsonString(c,"ID");
+                    String channel = getJsonString(c,"NAME");
+                    String image = getJsonString(c,"IMAGE");
+                    String type = getJsonString(c,"TYPE");
+                    String url = getJsonString(c,"URL");
 
-                    String fileName = img_path.substring(img_path.lastIndexOf('/') + 1);
+                    String fileName = image.substring(image.lastIndexOf('/') + 1);
 
-                    Log.d(TAG, channel_id + " - " + channel + " - " + img_path + " - " + fileName);
+                    Log.d(TAG, channel_id + " - " + channel + " - " + image + " - " + fileName + " - " + url);
                     TvChannel nChannel = new TvChannel(Integer.parseInt(channel_id),
-                            channel, img_path, Integer.parseInt(img_width),
-                            Integer.parseInt(img_height), domain);
+                            channel, image, type, url);
 
                     ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
                     File file = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);
@@ -501,7 +499,7 @@ public class Main2Activity extends AppCompatActivity
 
                     if (!file.exists()) {
                         // Execute the async task
-                        new Main2Activity.DownloadTask(nChannel).execute(img_path, fileName);
+                        new Main2Activity.DownloadTask(nChannel).execute(image, fileName);
                     } else {
                         nChannel.setAbsImgFileName(file.getAbsolutePath());
                     }
@@ -559,7 +557,7 @@ public class Main2Activity extends AppCompatActivity
             }
             JSONArray sports = null;
             try {
-                sports = mydata.getJSONArray("SPORTS");
+                sports = mydata.getJSONArray("COMPETS");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -574,13 +572,29 @@ public class Main2Activity extends AppCompatActivity
                 }
 
                 try {
-                    String sport_id = getJsonString(sport,"ID");
+                    String competition_id =  getJsonString(sport,"ID");
+                    String sport_id = getJsonString(sport,"SPORTID");
                     String name = getJsonString(sport,"NAME");
-                    String shortname = getJsonString(sport,"SHORTNAME");
+                    String image = getJsonString(sport,"IMAGE");
+                    String ongoing = getJsonString(sport,"ONGOING");
+                    String normalcolor = getJsonString(sport,"NORMALCOLOR");
+                    String darkcolor = getJsonString(sport,"DARKCOLOR");
 
-                    Log.d(TAG, sport_id + " - " + name + " - " + shortname);
-                    Sport nSport = new Sport(Integer.parseInt(sport_id),
-                            name, shortname);
+                    Log.d(TAG, competition_id + " - " + sport_id + " - " + name + " - " + image);
+                    Competition nSport = new Competition(Integer.parseInt(competition_id),name,image,Integer.parseInt(sport_id),Integer.parseInt(ongoing),normalcolor,darkcolor);
+
+                    String fileName = image.substring(image.lastIndexOf('/') + 1);
+
+                    ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
+                    File file = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);
+                    file = new File(file, fileName);
+
+                    if (!file.exists()) {
+                        // Execute the async task
+                        new Main2Activity.DownloadCompetitionTask(nSport).execute(image, fileName);
+                    } else {
+                        nSport.setAbsImgFileName(file.getAbsolutePath());
+                    }
 
                     arrayListSports.add(nSport);
 
@@ -675,6 +689,69 @@ public class Main2Activity extends AppCompatActivity
 
                 //Log.d(TAG,imageInternalUri.toString());
                 tvChannel.setAbsImgFileName(imageInternalUri.toString());
+
+                // Return the downloaded bitmap
+                return bmp;
+
+            }catch(IOException e){
+                e.printStackTrace();
+            }finally{
+                // Disconnect the http url connection
+                connection.disconnect();
+            }
+            return null;
+        }
+
+        // When all async task done
+        protected void onPostExecute(Bitmap result){
+            // Hide the progress dialog
+            mProgressDialog.dismiss();
+            customAdapter.notifyDataSetChanged();
+        }
+    }
+
+
+    /**
+     * Store Images on local filesystem
+     */
+    @SuppressLint("StaticFieldLeak")
+    private class DownloadCompetitionTask extends AsyncTask<String, Void, Bitmap>{
+
+        Competition competition;
+
+        private DownloadCompetitionTask(Competition competition) {
+            this.competition = competition;
+        }
+        // Before the tasks execution
+        protected void onPreExecute(){
+            // Display the progress dialog on async task start
+            mProgressDialog.show();
+        }
+
+        // Do the task in background/non UI thread
+        protected Bitmap doInBackground(String... urls){
+            URL url = stringToURL(urls[0]);
+            HttpURLConnection connection = null;
+
+            try{
+                // Initialize a new http url connection
+                connection = (HttpURLConnection) url.openConnection();
+
+                // Connect the http url connection
+                connection.connect();
+
+                // Get the input stream from http url connection
+                InputStream inputStream = connection.getInputStream();
+                // Initialize a new BufferedInputStream from InputStream
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+                // Convert BufferedInputStream to Bitmap object
+                Bitmap bmp = BitmapFactory.decodeStream(bufferedInputStream);
+
+                // Save bitmap to internal storage
+                Uri imageInternalUri = saveImageToInternalStorage(bmp, urls[1]);
+
+                //Log.d(TAG,imageInternalUri.toString());
+                competition.setAbsImgFileName(imageInternalUri.toString());
 
                 // Return the downloaded bitmap
                 return bmp;

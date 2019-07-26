@@ -14,10 +14,10 @@ import java.util.ArrayList;
 public class SportsAdapter extends BaseAdapter {
 
     private Context context;
-    private ArrayList<Sport> arrayListSport;
+    private ArrayList<Competition> arrayListSport;
     private ViewGroup parent;
 
-    public SportsAdapter(Context context, ArrayList<Sport> array){
+    public SportsAdapter(Context context, ArrayList<Competition> array){
         this.arrayListSport=array;
         this.context = context;
     }
@@ -44,10 +44,13 @@ public class SportsAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.list_sports, parent, false);
         }
 
-        TextView txtView1 = convertView.findViewById(R.id.chntxt1);
-        TextView txtView2 = convertView.findViewById(R.id.chntxt2);
-        txtView1.setText(Integer.toString(this.arrayListSport.get(i).getId()));
-        txtView2.setText(this.arrayListSport.get(i).getName());
+        TextView txtView = convertView.findViewById(R.id.chntxt);
+        txtView.setText(this.arrayListSport.get(i).getName());
+
+        if(this.arrayListSport.get(i).getAbsImgFileName()!=null) {
+            ImageView iv = convertView.findViewById(R.id.imgSport);
+            iv.setImageURI(Uri.parse(this.arrayListSport.get(i).getAbsImgFileName()));
+        }
 
         // returns the view for the current row
         return convertView;

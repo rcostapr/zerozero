@@ -44,10 +44,8 @@ public class CustomAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.list_tvchannel, parent, false);
         }
 
-        TextView txtView1 = convertView.findViewById(R.id.chntxt1);
-        TextView txtView2 = convertView.findViewById(R.id.chntxt2);
-        txtView1.setText(Integer.toString(this.arrayListChannel.get(i).getId()));
-        txtView2.setText(this.arrayListChannel.get(i).getName());
+        TextView txtView = convertView.findViewById(R.id.chntxt);
+        txtView.setText(this.arrayListChannel.get(i).getName());
 
         if(this.arrayListChannel.get(i).getAbsImgFileName()!=null) {
             ImageView iv = convertView.findViewById(R.id.imgChannelId);

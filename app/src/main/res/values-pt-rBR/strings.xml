@@ -16,18 +16,18 @@
     <string name="with_internet">Com ligação à internet</string>
     <string name="updating_application">Updating Application</string>
     <string name="downloading_content">Please wait, we are downloading content...</string>
-    <string name="urlTVChannel">http://www.zerozero.pt/api/v1/getTVChannel/AppKey/6RaJ9G7G/DomainID/br</string>
-    <string name="urlSports">http://www.zerozero.pt/api/v1/getSports/AppKey/7UdS89gI</string>
-    <string name="sports_list">Lista de Desportos</string>
+    <string name="urlTVChannel">http://www.zerozero.pt/api/v1/getChannels/AppKey/6hjKrg45/DomainID/br</string>
+    <string name="urlSports">http://www.zerozero.pt/api/v1/getCompetitions/AppKey/54hjflhsw6/DomainID/br</string>
+    <string name="sports_list">Lista de Competições</string>
     <string name="channel_list">Lista de Canais</string>
     <string name="canais">Canais</string>
-    <string name="desportos">Desportos</string>
+    <string name="desportos">Competições</string>
     <string name="app_idioma">App Idioma</string>
     <string name="idioma_default">Default</string>
     <string name="idioma_pt">Português</string>
     <string name="idioma_es">Espanhol</string>
     <string name="idioma_br">Brasileiro</string>
-    <string name="back_to_sports">Voltar Lista de Desportos</string>
+    <string name="back_to_sports">Voltar Lista de Competições</string>
     <string name="updating_app">A actualizar a aplicação</string>
     <string name="urlChannel">http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/br/SportsID/</string>
     <string name="downloading_new">A carregar actualizações, por favor espere...</string>
@@ -35,6 +35,9 @@
     <string name="resultados_anteriores">Resultados Anteriores</string>
     <string name="odds_do_jogo">Odds do Jogo</string>
     <string name="title_activity_match_info">Informações do Jogo</string>
-    <string name="urlTeam">http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/br/TeamID/</string>
+    <string name="urlTeam">http://www.zerozero.pt/api/v1/getTeam/AppKey/3bLTwE2r/TeamID/</string>
     <string name="today">Hoje</string>
+    <string name="urlZapping">http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/br</string>
+    <string name="urlMatch">http://www.zerozero.pt/api/v1/getMatch/AppKey/3bRT1D7a/MatchID/</string>
+    <string name="urlCompetitions">http://www.zerozero.pt/api/v1/getCompetitions/AppKey/54hjflhsw6/DomainID/br</string>
 </resources>

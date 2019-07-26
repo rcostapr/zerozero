@@ -9,30 +9,15 @@ public class Match implements Serializable {
     private int homeTeamId;
     private int awayTeamId;
     private int sportsId;
+    private int competitionId;
 
-    private String domain;
+    private String toolTip;
     private String matchDay;
     private String homeTeam;
     private String awayTeam;
-    private String channel;
-    private String sports;
 
     private String absfileImgHomeTeam;
     private String absfileImgAwayTeam;
-
-    public Match(int matchId, int channelId, String domain, String matchDay, int homeTeamId, int awayTeamId, String homeTeam, String awayTeam, int sportsId, String channel, String sports) {
-        this.matchDay=matchDay;
-        this.matchId=matchId;
-        this.channelId=channelId;
-        this.homeTeam=homeTeam;
-        this.homeTeamId=homeTeamId;
-        this.domain=domain;
-        this.awayTeam=awayTeam;
-        this.awayTeamId=awayTeamId;
-        this.channel=channel;
-        this.sports=sports;
-        this.sportsId=sportsId;
-    }
 
     public int getMatchId() {
         return matchId;
@@ -74,12 +59,20 @@ public class Match implements Serializable {
         this.sportsId = sportsId;
     }
 
-    public String getDomain() {
-        return domain;
+    public int getCompetitionId() {
+        return competitionId;
     }
 
-    public void setDomain(String domain) {
-        this.domain = domain;
+    public void setCompetitionId(int competitionId) {
+        this.competitionId = competitionId;
+    }
+
+    public String getToolTip() {
+        return toolTip;
+    }
+
+    public void setToolTip(String toolTip) {
+        this.toolTip = toolTip;
     }
 
     public String getMatchDay() {
@@ -106,22 +99,6 @@ public class Match implements Serializable {
         this.awayTeam = awayTeam;
     }
 
-    public String getChannel() {
-        return channel;
-    }
-
-    public void setChannel(String channel) {
-        this.channel = channel;
-    }
-
-    public String getSports() {
-        return sports;
-    }
-
-    public void setSports(String sports) {
-        this.sports = sports;
-    }
-
     public String getAbsfileImgHomeTeam() {
         return absfileImgHomeTeam;
     }
@@ -138,4 +115,16 @@ public class Match implements Serializable {
         this.absfileImgAwayTeam = absfileImgAwayTeam;
     }
 
+    public Match(int matchId, int channelId, int competitionId, String matchDay, int homeTeamId, int awayTeamId, String homeTeam, String awayTeam, int sportsId, String toolTip) {
+        this.matchDay=matchDay;
+        this.matchId=matchId;
+        this.channelId=channelId;
+        this.homeTeam=homeTeam;
+        this.homeTeamId=homeTeamId;
+        this.toolTip=toolTip;
+        this.awayTeam=awayTeam;
+        this.awayTeamId=awayTeamId;
+        this.sportsId=sportsId;
+        this.competitionId=competitionId;
+    }
 }

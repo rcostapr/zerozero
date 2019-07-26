@@ -13,7 +13,7 @@ public class State implements Serializable {
     private String idioma = "default";
     private String idiomaCountry = "default";
     private ArrayList<TvChannel> arrayListChannel = null;
-    private ArrayList<Sport> arrayListSports = null;
+    private ArrayList<Competition> arrayListSports = null;
     private ArrayList<TvChannelList> arrayTvChannelList = new ArrayList<>();
     private ArrayList<TvSportList> arrayTvSportList = new ArrayList<>();
     private ArrayList<TvTeamList> arrayTvTeamList = new ArrayList<>();
@@ -129,11 +129,11 @@ public class State implements Serializable {
         this.arrayListChannel = arrayListChannel;
     }
 
-    public ArrayList<Sport> getArrayListSports() {
+    public ArrayList<Competition> getArrayListSports() {
         return arrayListSports;
     }
 
-    public void setArrayListSports(ArrayList<Sport> arrayListSports) {
+    public void setArrayListSports(ArrayList<Competition> arrayListSports) {
         this.arrayListSports = arrayListSports;
     }
 

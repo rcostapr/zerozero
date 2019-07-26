@@ -69,8 +69,8 @@ public class MatchAdapter extends BaseAdapter {
                 SimpleDateFormat timeFormat = new SimpleDateFormat("H:mm");
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd - MM - yyyy");
 
-                txtBottom.setText(this.arrayListChannel.get(i).getChannel()+"     "+timeFormat.format(matchDate));
-                txtTop.setText(this.arrayListChannel.get(i).getSports() + "     " + dateFormat.format(matchDate));
+                txtBottom.setText(getChannelName(this.arrayListChannel.get(i).getChannelId())+"     "+timeFormat.format(matchDate));
+                txtTop.setText(this.arrayListChannel.get(i).getSportsId() + "     " + dateFormat.format(matchDate));
                 txtHomeTeam.setText(this.arrayListChannel.get(i).getHomeTeam());
                 txtAwayTeam.setText(this.arrayListChannel.get(i).getAwayTeam());
 
@@ -118,7 +118,7 @@ public class MatchAdapter extends BaseAdapter {
 
                 txtHomeTeamNew.setText(this.arrayListChannel.get(i).getHomeTeam());
                 txtAwayTeamNew.setText(this.arrayListChannel.get(i).getAwayTeam());
-                txtLeague.setText(this.arrayListChannel.get(i).getSports());
+                txtLeague.setText(getChannelName(this.arrayListChannel.get(i).getChannelId()));
 
                 if(this.arrayListChannel.get(i).getAbsfileImgHomeTeam()!= null) {
                     ImageView ivhN = convertView.findViewById(R.id.imgHomeTeamNew);
@@ -131,7 +131,7 @@ public class MatchAdapter extends BaseAdapter {
                 }
 
                 TextView txtTvChannel = convertView.findViewById(R.id.txtTvChannel);
-                txtTvChannel.setText(this.arrayListChannel.get(i).getChannel());
+                txtTvChannel.setText(getChannelName(this.arrayListChannel.get(i).getChannelId()));
 
                 ArrayList<TvChannel> tvChannels = state.getArrayListChannel();
                 for(int k = 0; k< tvChannels.size();k++){
@@ -157,5 +157,14 @@ public class MatchAdapter extends BaseAdapter {
         return today.get(Calendar.DAY_OF_MONTH) == specifiedDate.get(Calendar.DAY_OF_MONTH)
                 &&  today.get(Calendar.MONTH) == specifiedDate.get(Calendar.MONTH)
                 &&  today.get(Calendar.YEAR) == specifiedDate.get(Calendar.YEAR);
+    }
+
+    private String getChannelName(int channelId){
+        for(int k=0; k<state.getArrayListChannel().size(); k++){
+            if(state.getArrayListChannel().get(k).getId()==channelId){
+                return state.getArrayListChannel().get(k).getName();
+            }
+        }
+        return null;
     }
 }

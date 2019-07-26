@@ -56,7 +56,7 @@ public class info_sport extends AppCompatActivity {
     private JSONObject jsonTVChannel = null;
 
     private ArrayList<Match> arrayListChannel;
-    private Sport tvSport;
+    private Competition tvSport;
     private URL urlChannel;
     private ListView channelList;
     private MatchAdapter matchAdapter;
@@ -132,7 +132,8 @@ public class info_sport extends AppCompatActivity {
         mProgressDialog.setMessage(getString(R.string.downloading_new));
 
         Intent intent = getIntent();
-        this.tvSport =  (Sport) intent.getSerializableExtra("tvSports");
+        this.tvSport =  (Competition) intent.getSerializableExtra("tvSports");
+        this.urlChannel = getUrl(getString(R.string.urlZapping));
 
         TextView txtView1 = findViewById(R.id.chntxt1);
         TextView txtView2 = findViewById(R.id.chntxt2);
@@ -141,8 +142,7 @@ public class info_sport extends AppCompatActivity {
         ImageView iv = findViewById(R.id.imgChannelId);
         iv.setImageResource(R.drawable.ic_video_camera);
 
-        this.urlChannel = getUrl(getString(R.string.urlChannel)
-                + Integer.toString(tvSport.getId()));
+
 
         swipeRefreshLayout=findViewById(R.id.swiperefreshsport);
         swipeRefreshLayout.setColorSchemeColors(Color.parseColor(COLOR_BACKGROUND));
@@ -244,7 +244,7 @@ public class info_sport extends AppCompatActivity {
             }
             JSONArray tvchannels = null;
             try {
-                tvchannels = mydata.getJSONArray("ZAPPING");
+                tvchannels = mydata.getJSONArray("data_events");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -260,57 +260,61 @@ public class info_sport extends AppCompatActivity {
 
                 try {
                     String matchId = getJsonString(c,"MATCHID");
-                    String channelId = getJsonString(c,"CHANNELID");
-                    String domain = getJsonString(c,"DOMAIN");
-                    String matchDay = getJsonString(c,"DATA");
-                    String homeTeamId = getJsonString(c,"HOMETEAMID");
-                    String awayTeamId = getJsonString(c,"AWAYTEAMID");
-                    String homeTeam = getJsonString(c,"HOMETEAM");
-                    String awayTeam = getJsonString(c,"AWAYTEAM");
-                    String sportsId = getJsonString(c,"SPORTSID");
-                    String channel = getJsonString(c,"CHANNEL");
-                    String sports = getJsonString(c,"SPORTS");
-                    String imgHomeTeam = getJsonString(c,"HOMETEAM_LOGO");
+                    String channelId = getJsonString(c,"CHANNELIDS");
+                    String sportsId = getJsonString(c,"SPORTID");
+                    String competitionId = getJsonString(c,"COMPETITIONID");
+                    String matchDay = getJsonString(c,"DATE");
+                    String toolTip = getJsonString(c,"TOOLTIP");
+
+                    JSONObject homeTeamArray = null;
+                    homeTeamArray = c.getJSONObject("HOMETEAM");
+                    JSONObject awayTeamArray = null;
+                    awayTeamArray = c.getJSONObject("AWAYTEAM");
+
+                    String homeTeamId = getJsonString(homeTeamArray,"ID");
+                    String homeTeam = getJsonString(homeTeamArray,"NAME");
+                    String imgHomeTeam = getJsonString(homeTeamArray,"IMAGE");
                     String fileImgHomeTeam = imgHomeTeam.substring(imgHomeTeam.lastIndexOf('/') + 1);
-                    String imgAwatTeam = getJsonString(c,"AWAYTEAM_LOGO");
-                    String fileImgAwatTeam = imgAwatTeam.substring(imgAwatTeam.lastIndexOf('/') + 1);
 
-                    ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
-                    File file1 = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);
-                    file1 = new File(file1, fileImgHomeTeam);
-                    File file2 = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);
-                    file2 = new File(file2, fileImgAwatTeam);
+                    String awayTeamId = getJsonString(awayTeamArray,"ID");
+                    String awayTeam = getJsonString(awayTeamArray,"NAME");
+                    String imgAwayTeam = getJsonString(awayTeamArray,"IMAGE");
+                    String fileImgAwayTeam = imgAwayTeam.substring(imgAwayTeam.lastIndexOf('/') + 1);
 
+                    if(tvSport.getId()== Integer.parseInt(competitionId)) {
 
-
-                    Log.d(TAG, channelId + " - " + homeTeam + " - " + awayTeam + " - " + matchDay);
-                    Match nMatch = new Match(Integer.parseInt(matchId),
-                            Integer.parseInt(channelId),
-                            domain,
-                            matchDay,
-                            Integer.parseInt(homeTeamId),
-                            Integer.parseInt(awayTeamId),
-                            homeTeam,
-                            awayTeam,
-                            Integer.parseInt(sportsId),
-                            channel,
-                            sports);
+                        ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
+                        File file1 = wrapper.getDir(DISK_CACHE_SUBDIR, MODE_PRIVATE);
+                        file1 = new File(file1, fileImgHomeTeam);
+                        File file2 = wrapper.getDir(DISK_CACHE_SUBDIR, MODE_PRIVATE);
+                        file2 = new File(file2, fileImgAwayTeam);
 
 
-                    if (!file1.exists()) {
-                        new DownloadTask(nMatch,1).execute(imgHomeTeam, fileImgHomeTeam);
-                    } else {
-                        nMatch.setAbsfileImgHomeTeam(file1.getAbsolutePath());
+                        Log.d(TAG, channelId + " - " + homeTeam + " - " + awayTeam + " - " + matchDay);
+                        Match nMatch = new Match(Integer.parseInt(matchId),
+                                Integer.parseInt(channelId),
+                                Integer.parseInt(competitionId),
+                                matchDay,
+                                Integer.parseInt(homeTeamId),
+                                Integer.parseInt(awayTeamId),
+                                homeTeam,
+                                awayTeam,
+                                Integer.parseInt(sportsId),
+                                toolTip);
+
+
+                        if (!file1.exists()) {
+                            new DownloadTask(nMatch, 1).execute(imgHomeTeam, fileImgHomeTeam);
+                        } else {
+                            nMatch.setAbsfileImgHomeTeam(file1.getAbsolutePath());
+                        }
+                        if (!file2.exists()) {
+                            new DownloadTask(nMatch, 2).execute(imgAwayTeam, fileImgAwayTeam);
+                        } else {
+                            nMatch.setAbsfileImgAwayTeam(file2.getAbsolutePath());
+                        }
+                        arrayListChannel.add(nMatch);
                     }
-                    if (!file2.exists()) {
-                        new DownloadTask(nMatch,2).execute(imgAwatTeam, fileImgAwatTeam);
-                    } else {
-                        nMatch.setAbsfileImgAwayTeam(file2.getAbsolutePath());
-                    }
-
-
-                    arrayListChannel.add(nMatch);
-
 
                 } catch (JSONException e) {
                     e.printStackTrace();

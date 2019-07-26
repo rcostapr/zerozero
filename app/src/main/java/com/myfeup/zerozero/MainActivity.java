@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
             }
             JSONArray tvchannels = null;
             try {
-                tvchannels = mydata.getJSONArray("TVCHANNEL");
+                tvchannels = mydata.getJSONArray("data");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -204,40 +204,34 @@ public class MainActivity extends AppCompatActivity {
                 if (c != null) {
                     String channel_id = null;
                     try {
-                        channel_id = c.getString("CHANNELID");
+                        channel_id = c.getString("ID");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     String channel = null;
                     try {
-                        channel = c.getString("CHANNEL");
+                        channel = c.getString("NAME");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    String domain = null;
+                    String type = null;
                     try {
-                        domain = c.getString("DOMAIN");
+                        type = c.getString("TYPE");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    String url = null;
+                    try {
+                        url = c.getString("URL");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     String img_path = null;
                     String fileName = null;
                     try {
-                        img_path = c.getString("IMGPATH");
+                        img_path = c.getString("IMAGE");
                         fileName = img_path.substring(img_path.lastIndexOf('/') + 1);
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String img_height = null;
-                    try {
-                        img_height = c.getString("IMGHEIGHT");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String img_width = null;
-                    try {
-                        img_width = c.getString("IMGWIDTH");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -248,15 +242,12 @@ public class MainActivity extends AppCompatActivity {
                     // adding each child node to HashMap key => value
                     channels.put("channel_id", channel_id);
                     channels.put("channel", channel);
-                    channels.put("domain", domain);
+                    channels.put("type", type);
                     channels.put("img_path", img_path);
-                    channels.put("img_height", img_height);
-                    channels.put("img_width", img_width);
 
                     Log.d(TAG, channel_id + " - " + channel + " - " + img_path + " - " + fileName);
                     TvChannel nChannel = new TvChannel(Integer.parseInt(channel_id),
-                            channel, img_path, Integer.parseInt(img_width),
-                            Integer.parseInt(img_height), domain);
+                            channel, img_path, type,url);
 
                     ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
                     File file = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);

@@ -18,6 +18,7 @@ import com.myfeup.zerozero.Match;
 import com.myfeup.zerozero.R;
 
 import com.myfeup.zerozero.State;
+import com.myfeup.zerozero.TvChannel;
 import com.myfeup.zerozero.TvTeamList;
 
 import org.json.JSONArray;
@@ -59,6 +60,7 @@ public class TeamCalendar {
     private JSONObject jsonTVTEAM = null;
     private ArrayList<Match> arrayListChannel = new ArrayList<>();
     private ArrayList<CalendarCell> arrayCalendarCell = new ArrayList<>();
+    private ArrayList<TvChannel> arrayListTvChannel = new ArrayList<>();
     private int iniMonth;
     private int iniYear;
     private int firstDay;
@@ -105,6 +107,8 @@ public class TeamCalendar {
         } else {
             importTeamListFromCache();
         }
+
+        arrayListTvChannel = state.getArrayListChannel();
     }
 
     private void buildArrayCalendarCell() {
@@ -181,7 +185,7 @@ public class TeamCalendar {
                     dayEvents.add(matchDay.getHomeTeam());
                     dayEvents.add("Vs");
                     dayEvents.add(matchDay.getAwayTeam());
-                    dayEvents.add(matchDay.getChannel());
+                    dayEvents.add(getChannelName(matchDay.getChannelId()));
                     dayEvents.add(timeFormat.format(matchDate));
                     match = matchDay;
                 }
@@ -309,7 +313,7 @@ public class TeamCalendar {
             JSONArray tvchannels = null;
             if(mydata!=null) {
                 try {
-                    tvchannels = mydata.getJSONArray("ZAPPING");
+                    tvchannels = mydata.getJSONArray("PROFILE");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -326,41 +330,47 @@ public class TeamCalendar {
                     }
 
                     try {
-                        String matchId = getJsonString(c, "MATCHID");
-                        String channelId = getJsonString(c, "CHANNELID");
-                        String domain = getJsonString(c, "DOMAIN");
-                        String matchDay = getJsonString(c, "DATA");
-                        String homeTeamId = getJsonString(c, "HOMETEAMID");
-                        String awayTeamId = getJsonString(c, "AWAYTEAMID");
-                        String homeTeam = getJsonString(c, "HOMETEAM");
-                        String awayTeam = getJsonString(c, "AWAYTEAM");
-                        String sportsId = getJsonString(c, "SPORTSID");
-                        String channel = getJsonString(c, "CHANNEL");
-                        String sports = getJsonString(c, "SPORTS");
-                        String imgHomeTeam = getJsonString(c, "HOMETEAM_LOGO");
+                        String matchId = getJsonString(c,"MATCHID");
+                        String channelId = getJsonString(c,"CHANNELIDS");
+                        String sportsId = getJsonString(c,"SPORTID");
+                        String competitionId = getJsonString(c,"COMPETITIONID");
+                        String matchDay = getJsonString(c,"DATE");
+                        String toolTip = getJsonString(c,"TOOLTIP");
+
+                        JSONObject homeTeamArray = null;
+                        homeTeamArray = c.getJSONObject("HOMETEAM");
+                        JSONObject awayTeamArray = null;
+                        awayTeamArray = c.getJSONObject("AWAYTEAM");
+
+                        String homeTeamId = getJsonString(homeTeamArray,"ID");
+                        String homeTeam = getJsonString(homeTeamArray,"NAME");
+                        String imgHomeTeam = getJsonString(homeTeamArray,"IMAGE");
                         String fileImgHomeTeam = imgHomeTeam.substring(imgHomeTeam.lastIndexOf('/') + 1);
-                        String imgAwatTeam = getJsonString(c, "AWAYTEAM_LOGO");
-                        String fileImgAwatTeam = imgAwatTeam.substring(imgAwatTeam.lastIndexOf('/') + 1);
+
+                        String awayTeamId = getJsonString(awayTeamArray,"ID");
+                        String awayTeam = getJsonString(awayTeamArray,"NAME");
+                        String imgAwayTeam = getJsonString(awayTeamArray,"IMAGE");
+                        String fileImgAwayTeam = imgAwayTeam.substring(imgAwayTeam.lastIndexOf('/') + 1);
+
 
                         ContextWrapper wrapper = new ContextWrapper(context);
-                        File file1 = wrapper.getDir(DISK_CACHE_SUBDIR, MODE_PRIVATE);
+                        File file1 = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);
                         file1 = new File(file1, fileImgHomeTeam);
-                        File file2 = wrapper.getDir(DISK_CACHE_SUBDIR, MODE_PRIVATE);
-                        file2 = new File(file2, fileImgAwatTeam);
+                        File file2 = wrapper.getDir(DISK_CACHE_SUBDIR,MODE_PRIVATE);
+                        file2 = new File(file2, fileImgAwayTeam);
 
 
                         Log.d("channelId", channelId + " - " + homeTeam + " - " + awayTeam + " - " + matchDay);
                         Match nMatch = new Match(Integer.parseInt(matchId),
                                 Integer.parseInt(channelId),
-                                domain,
+                                Integer.parseInt(competitionId),
                                 matchDay,
                                 Integer.parseInt(homeTeamId),
                                 Integer.parseInt(awayTeamId),
                                 homeTeam,
                                 awayTeam,
                                 Integer.parseInt(sportsId),
-                                channel,
-                                sports);
+                                toolTip);
 
 
                         if (!file1.exists()) {
@@ -369,7 +379,7 @@ public class TeamCalendar {
                             nMatch.setAbsfileImgHomeTeam(file1.getAbsolutePath());
                         }
                         if (!file2.exists()) {
-                            new DownloadTask(nMatch, 2).execute(imgAwatTeam, fileImgAwatTeam);
+                            new DownloadTask(nMatch, 2).execute(imgAwayTeam, fileImgAwayTeam);
                         } else {
                             nMatch.setAbsfileImgAwayTeam(file2.getAbsolutePath());
                         }
@@ -576,5 +586,13 @@ public class TeamCalendar {
         }
     }
 
+    private String getChannelName(int channelId){
+        for(int k=0; k<arrayListTvChannel.size(); k++){
+            if(arrayListTvChannel.get(k).getId()==channelId){
+                return arrayListTvChannel.get(k).getName();
+            }
+        }
+        return null;
+    }
 }
 

@@ -1,13 +1,16 @@
 package com.myfeup.zerozero;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,13 +21,26 @@ import android.widget.TextView;
 import com.myfeup.zerozero.calendar.CalendarActivity;
 import com.myfeup.zerozero.calendar.CalendarItem;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -34,6 +50,8 @@ public class MatchInfo extends AppCompatActivity {
     private Context mContext;
     private static final String FILE_STATE = "out.txt";
     private State state = new State(1);
+    private JSONObject jsonTVChannel = null;
+    private ArrayList<TvChannel> arrayListChannel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +76,18 @@ public class MatchInfo extends AppCompatActivity {
         Intent intent = getIntent();
         tvMatch =  (Match) intent.getSerializableExtra("tvMatch");
 
+        // GET File Status
+        File file = getApplicationContext().getFileStreamPath(FILE_STATE);
+        if(file.exists()) {
+            try {
+                this.state = getState();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
         TextView matchInfoSport = findViewById(R.id.match_Info_Sport);
         TextView matchInfoData = findViewById(R.id.match_Info_Data);
         TextView matchInfoCanal = findViewById(R.id.match_Info_Canal);
@@ -78,8 +108,8 @@ public class MatchInfo extends AppCompatActivity {
         SimpleDateFormat timeFormat = new SimpleDateFormat("H:mm");
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd - MM - yyyy");
 
-        matchInfoCanal.setText(tvMatch.getChannel()+"     "+timeFormat.format(matchDate));
-        matchInfoSport.setText(tvMatch.getSports());
+        matchInfoCanal.setText(getChannelName(tvMatch.getChannelId())+"     "+timeFormat.format(matchDate));
+        matchInfoSport.setText(Integer.toString(tvMatch.getSportsId()));
         matchInfoData.setText(dateFormat.format(matchDate));
 
         matchInfoHomeTeam.setText(tvMatch.getHomeTeam());
@@ -198,5 +228,164 @@ public class MatchInfo extends AppCompatActivity {
         fis.close();
         return myState;
     }
+    private String getChannelName(int channelId){
 
+        if(state.getArrayListChannel()!=null)
+            this.arrayListChannel = state.getArrayListChannel();
+        else
+            getArrayListChannel();
+
+
+
+        for(int k=0; k < arrayListChannel.size(); k++){
+            if(arrayListChannel.get(k).getId()==channelId){
+                return arrayListChannel.get(k).getName();
+            }
+        }
+        return null;
+    }
+
+    private void getArrayListChannel(){
+
+        URL urlTVChannel = null;
+        try {
+            urlTVChannel = new URL(getString(R.string.urlTVChannel));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        new MatchInfo.getJson().execute(urlTVChannel);
+
+    }
+
+
+    private class getJson extends AsyncTask<URL, Integer, Long> {
+
+        JSONObject jsonObj = null;
+
+        protected Long doInBackground(URL... urls) {
+            int count = urls.length;
+            long totalSize = 0;
+            for (int i = 0; i < count; i++) {
+                try {
+                    jsonObj = getJsonUrl(urls[i]);
+                    switch (i){
+                        case 0:
+                            jsonTVChannel = jsonObj;
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                publishProgress((int) ((i / (float) count) * 100));
+                // Escape early if cancel() is called
+                if (isCancelled()) break;
+            }
+            return totalSize;
+        }
+        protected void onPostExecute(Long result) {
+
+            JSONObject mydata = null;
+            try {
+                mydata = jsonTVChannel.getJSONObject("data");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            JSONArray tvchannels = null;
+            try {
+                tvchannels = mydata.getJSONArray("data");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            // looping through All Channels
+            for (int i = 0; i < tvchannels.length(); i++) {
+                JSONObject c = null;
+                try {
+                    c = tvchannels.getJSONObject(i);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    String channel_id = getJsonString(c,"ID");
+                    String channel = getJsonString(c,"NAME");
+                    String image = getJsonString(c,"IMAGE");
+                    String type = getJsonString(c,"TYPE");
+                    String url = getJsonString(c,"URL");
+
+                    String fileName = image.substring(image.lastIndexOf('/') + 1);
+
+                    Log.d("MATCH INFO", channel_id + " - " + channel + " - " + image + " - " + fileName + " - " + url);
+                    TvChannel nChannel = new TvChannel(Integer.parseInt(channel_id),
+                            channel, image, type, url);
+
+                    arrayListChannel.add(nChannel);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            state.setArrayListChannel(arrayListChannel);
+            try {
+                saveState(state);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public JSONObject getJsonUrl(URL url) throws IOException {
+
+        String jsonStr;
+        JSONObject jsonObj = null;
+        Log.d("URL", url.toString());
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+        try {
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            //Log.d("reader", convertStreamToString(in));
+            jsonStr = convertStreamToString(in);
+
+        } finally {
+            urlConnection.disconnect();
+        }
+
+        try {
+            jsonObj = new JSONObject(jsonStr);
+        } catch (final JSONException e) {
+            Log.e("JSON", "Json parsing error: " + e.getMessage());
+        }
+
+        return jsonObj;
+    }
+
+    private String convertStreamToString(InputStream is) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
+    }
+
+    private String getJsonString(JSONObject c, String key) throws JSONException {
+        String val = null;
+        if (c!=null)
+            val = c.getString(key);
+        return val;
+    }
 }

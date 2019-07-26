@@ -2,9 +2,9 @@
 <resources>
     <string name="updating_application">Updating Application</string>
     <string name="downloading_content">Please wait, we are downloading content...</string>
-    <string name="urlTVChannel">http://www.zerozero.pt/api/v1/getTVChannel/AppKey/6RaJ9G7G/DomainID/pt</string>
-    <string name="urlSports">http://www.zerozero.pt/api/v1/getSports/AppKey/7UdS89gI</string>
-    <string name="sports_list">Lista de Desportos</string>
+    <string name="urlTVChannel">http://www.zerozero.pt/api/v1/getChannels/AppKey/6hjKrg45/DomainID/pt</string>
+    <string name="urlSports">http://www.zerozero.pt/api/v1/getCompetitions/AppKey/54hjflhsw6/DomainID/pt</string>
+    <string name="sports_list">" List of Competitions"</string>
     <string name="channel_list">Lista de Canais</string>
     <string name="canais">Canais</string>
     <string name="app_idioma">App Idioma</string>
@@ -12,9 +12,9 @@
     <string name="idioma_pt">Portuguese</string>
     <string name="idioma_es">Spanish</string>
     <string name="idioma_br">Brazilian</string>
-    <string name="back_to_sports">Voltar Lista de Desportos</string>
+    <string name="back_to_sports">Voltar Lista de Competições</string>
     <string name="updating_app">Updating Application</string>
     <string name="urlChannel">http://www.zerozero.pt/api/v1/getZapping/AppKey/6BaJ4G1Y/DomainID/pt/SportsID/</string>
     <string name="resultados_anteriores">Resultados Anteriores</string>
-    <string name="odds_do_jogo">Odds do Jogo</string>
+    <string name="odds_do_jogo">Game Odds</string>
 </resources>

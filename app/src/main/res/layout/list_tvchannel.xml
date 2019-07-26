@@ -9,27 +9,8 @@
     android:paddingRight="16dp">
 
     <TextView
-        android:id="@+id/chntxt2"
+        android:id="@+id/chntxt"
         android:layout_width="wrap_content"
-        android:layout_height="33dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="1dp"
-        android:layout_marginLeft="1dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_toEndOf="@+id/chntxt1"
-        android:layout_toRightOf="@+id/chntxt1"
-        android:textSize="14dp"
-        android:textColor="#ffffff00"
-        android:text="" />
-
-    <TextView
-        android:id="@+id/chntxt1"
-        android:layout_width="42dp"
         android:layout_height="33dp"
         android:layout_alignParentTop="true"
         android:layout_marginStart="10dp"

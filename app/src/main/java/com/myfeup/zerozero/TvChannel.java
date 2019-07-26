@@ -10,10 +10,9 @@ public class TvChannel implements Serializable {
 
     private int Id;
     private String name;
-    private String imgPath;
-    private int imgWidth;
-    private int imgHeight;
-    private String domain;
+    private String image;
+    private String type;
+    private String url;
     private String absImgFileName;
     private Date listDate = new Date();
 
@@ -25,21 +24,12 @@ public class TvChannel implements Serializable {
         this.absImgFileName = absImgFileName;
     }
 
-    public TvChannel(int Id, String name, String imgPath, int imgWidth, int imgHeight, String domain){
-        this.Id=Id;
-        this.name=name;
-        this.imgPath=imgPath;
-        this.imgWidth=imgWidth;
-        this.imgHeight=imgHeight;
-        this.domain=domain;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
+    public TvChannel(int ID, String NAME, String IMAGE, String TYPE, String URL){
+        this.Id=ID;
+        this.name=NAME;
+        this.image=IMAGE;
+        this.type=TYPE;
+        this.url=URL;
     }
 
     public int getId() {
@@ -58,28 +48,36 @@ public class TvChannel implements Serializable {
         this.name = name;
     }
 
-    public String getImgPath() {
-        return imgPath;
+    public String getImage() {
+        return image;
     }
 
-    public void setImgPath(String imgPath) {
-        this.imgPath = imgPath;
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    public int getImgWidth() {
-        return imgWidth;
+    public String getType() {
+        return type;
     }
 
-    public void setImgWidth(int imgWidth) {
-        this.imgWidth = imgWidth;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public int getImgHeight() {
-        return imgHeight;
+    public String getUrl() {
+        return url;
     }
 
-    public void setImgHeight(int imgHeight) {
-        this.imgHeight = imgHeight;
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Date getListDate() {
+        return listDate;
+    }
+
+    public void setListDate(Date listDate) {
+        this.listDate = listDate;
     }
 
     public long getDiffMinutes(Date compareDate){
